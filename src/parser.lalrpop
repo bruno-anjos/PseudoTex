@@ -1,0 +1,53 @@
+use crate::my_parser::{Expr, Translate};
+
+grammar;
+
+pub Main: Expr = {
+    BEGIN <e:Any> END => e
+};
+
+pub Any: Expr = {
+    <b: BasicExpr> => b,
+    <b: BasicExpr> <e: Any> => Expr::MultipleExpr{ e1: Box::new(b), e2: Box::new(e) }
+};
+
+pub BasicExpr: Expr = {
+    <e: Method> => e,
+    <e: Assign> => e,
+};
+
+pub Method: Expr = {
+    SimpleMethod,
+    ComplexMethod
+};
+
+pub SimpleMethod: Expr = {
+    UPON <id: STRING> DO COLON <e: Any> END => Expr::Method{ name: id.to_string(), body: Box::new(e) }
+};
+
+pub ComplexMethod: Expr = {
+    UPON <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR DO COLON <e: Any> END =>
+        Expr::MethodWithArgs{ name: id.to_string(), args: args, body: Box::new(e) }
+};
+
+pub Args: Vec<String> = {
+    <a: STRING> => vec![a.to_string()],
+    <a: STRING> COMMA <mut args: Args> => { let mut res = vec![a.to_string()]; res.append(&mut args); res }
+};
+
+pub Assign: Expr = {
+    <id:STRING> EQ <value:STRING> => Expr::Assign{ name: id.to_string(), value: value.to_string() }
+};
+
+match {
+    "="     => EQ,
+    "upon"  => UPON,
+    "do"    => DO,
+    ":"     => COLON,
+    ","     => COMMA,
+    "("     => OPEN_PAR,
+    ")"     => CLOSE_PAR,
+    "begin" => BEGIN,
+    "end"   => END,
+    r"\w+"  => STRING
+}
