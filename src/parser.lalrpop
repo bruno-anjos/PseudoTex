@@ -1,4 +1,4 @@
-use crate::my_parser::{Expr, Translate};
+use crate::my_parser::{Expr, Translate, Special};
 
 grammar;
 
@@ -14,6 +14,8 @@ pub Any: Expr = {
 pub BasicExpr: Expr = {
     <e: Method> => e,
     <e: Assign> => e,
+    <e: If> => e,
+    <e: STRING> => Expr::String(e.to_string()),
 };
 
 pub Method: Expr = {
@@ -39,6 +41,26 @@ pub Assign: Expr = {
     <id:STRING> EQ <value:STRING> => Expr::Assign{ name: id.to_string(), value: value.to_string() }
 };
 
+pub If: Expr = {
+    IF <condition: Condition> THEN <body: Any> END =>
+        Expr::If{ condition: Box::new(condition), body: Box::new(body) },
+    IF <condition: Condition> THEN <ifBody: Any> ELSE <elseBody: Any> END =>
+        Expr::IfElse{ condition: Box::new(condition), ifBody: Box::new(ifBody), elseBody: Box::new(elseBody) },
+};
+
+pub Condition: Expr = {
+    <left: Any> IN <right: Any> =>
+        Expr::Condition{ left: Box::new(left), special: Special::In, right: Box::new(right) },
+    EXISTS <right: Condition> =>
+            Expr::ConditionRightSide{ special: Special::Exists, right: Box::new(right) },
+    <s: STRING> => Expr::String(s.to_string()),
+};
+
+pub Special: Special = {
+    IN => Special::In,
+    EXISTS => Special::Exists,
+}
+
 match {
     "="     => EQ,
     "upon"  => UPON,
@@ -49,5 +71,10 @@ match {
     ")"     => CLOSE_PAR,
     "begin" => BEGIN,
     "end"   => END,
+    "in"    => IN,
+    "if"    => IF,
+    "else"  => ELSE,
+    "then"  => THEN,
+    "exists"=> EXISTS,
     r"\w+"  => STRING
 }

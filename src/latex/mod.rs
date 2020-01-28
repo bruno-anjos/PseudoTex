@@ -18,7 +18,7 @@ macro_rules! FUNCTION_CODE {
     \\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
     \\Fn{{\\FunctionID{{}}}}{{\n\
         {}\n
-    }}\n")
+    }}")
 }
 
 macro_rules! FUNCTION_WITH_ARGS_CODE {
@@ -26,9 +26,25 @@ macro_rules! FUNCTION_WITH_ARGS_CODE {
     \\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
     \\Fn{{\\FunctionID{{{}}}}}{{\n\
         {}\n
-    }}\n")
+    }}")
 }
 
 macro_rules! ASSIGN_CODE {
     () => ("{} $\\longleftarrow$ {}")
+}
+
+macro_rules! IN_CODE {
+    () => ("$\\in$")
+}
+
+macro_rules! EXISTS_CODE {
+    () => ("$\\exists$")
+}
+
+macro_rules! IF_CODE {
+    () => ("\\If{{{}}}{{{}}}");
+}
+
+macro_rules! IF_ELSE_CODE {
+    () => ("\\eIf{{{}}}{{{}}}{{{}}}");
 }
