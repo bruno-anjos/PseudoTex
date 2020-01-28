@@ -6,6 +6,8 @@ the simple pseudocode to the LaTex commands was a huge struggle so i decided to 
 this tool that translates a simple pseudocode language into the LaTex equivalent
 commands. I hope it makes you life easier :grin:.
 
+The pseudocode that PseudoTex follows is formalized in this [paper](PseudoCodeNotes.pdf).
+
 ## Installing
 
 For now to install the tool you have to clone the repo and have rust and cargo
@@ -38,9 +40,24 @@ PseudoTex supports:
 * variables
 * if
 * if/else
+* events
 * special symbols:
 	+ in
 	+ exists
+
+## TODO
+
+* Add [clap](https://clap.rs)
+* Add if/else if
+* Add if/else if/else
+* Add triggers
+* Add state
+* Add init
+* Add procedures
+* Add interface
+    + Add requests
+    + Add indications
+* Add binaries to github
 
 ## Contributing
 
