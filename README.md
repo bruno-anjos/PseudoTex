@@ -6,7 +6,8 @@ the simple pseudocode to the LaTex commands was a huge struggle so i decided to 
 this tool that translates a simple pseudocode language into the LaTex equivalent
 commands. I hope it makes you life easier :grin:.
 
-The pseudocode that PseudoTex follows is formalized in this [paper](PseudoCodeNotes.pdf).
+The pseudocode that PseudoTex follows is formalized in this [paper](PseudoCodeNotes.pdf)
+by João Leitão.
 
 ## Installing
 
