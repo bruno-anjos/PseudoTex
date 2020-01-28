@@ -1,0 +1,27 @@
+begin
+upon teste(arg1, arg2) do:
+	ola = falso
+	teste = falso
+	if a in set then
+		ola = true
+		if b exists in set then
+			ola = false
+		else
+			ola = true
+		end
+		if c in set then
+			ola = true
+		end
+	else
+		ola = false
+		if b exists in set then
+			ola = false
+		else
+			ola = true
+		end
+		if c in set then
+			ola = true
+		end
+	end
+end
+end

@@ -21,9 +21,25 @@ macro_rules! FUNCTION_CODE {
     }}")
 }
 
+macro_rules! EVENT_CODE {
+    () => ("\\SetKwFunction{{FunctionID}}{{{}}}\n\
+    \\SetKwProg{{Fn}}{{Upon event }}{{ do:}}{{}}\n\
+    \\Fn{{\\FunctionID{{}}}}{{\n\
+        {}\n
+    }}")
+}
+
 macro_rules! FUNCTION_WITH_ARGS_CODE {
     () => ("\\SetKwFunction{{FunctionID}}{{{}}}\n\
     \\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
+    \\Fn{{\\FunctionID{{{}}}}}{{\n\
+        {}\n
+    }}")
+}
+
+macro_rules! EVENT_WITH_ARGS_CODE {
+    () => ("\\SetKwFunction{{FunctionID}}{{{}}}\n\
+    \\SetKwProg{{Fn}}{{Upon event }}{{ do:}}{{}}\n\
     \\Fn{{\\FunctionID{{{}}}}}{{\n\
         {}\n
     }}")

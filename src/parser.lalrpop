@@ -1,4 +1,4 @@
-use crate::my_parser::{Expr, Translate, Special};
+use crate::my_parser::{Expr, Special};
 
 grammar;
 
@@ -14,13 +14,14 @@ pub Any: Expr = {
 pub BasicExpr: Expr = {
     <e: Method> => e,
     <e: Assign> => e,
-    <e: If> => e,
-    <e: STRING> => Expr::String(e.to_string()),
+    <e: If> => e
 };
 
 pub Method: Expr = {
     SimpleMethod,
-    ComplexMethod
+    ComplexMethod,
+    SimpleEvent,
+    ComplexEvent
 };
 
 pub SimpleMethod: Expr = {
@@ -30,6 +31,15 @@ pub SimpleMethod: Expr = {
 pub ComplexMethod: Expr = {
     UPON <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR DO COLON <e: Any> END =>
         Expr::MethodWithArgs{ name: id.to_string(), args: args, body: Box::new(e) }
+};
+
+pub SimpleEvent: Expr = {
+    UPON EVENT <id: STRING> DO COLON <e: Any> END => Expr::Event{ name: id.to_string(), body: Box::new(e) }
+};
+
+pub ComplexEvent: Expr = {
+    UPON EVENT <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR DO COLON <e: Any> END =>
+        Expr::EventWithArgs{ name: id.to_string(), args: args, body: Box::new(e) }
 };
 
 pub Args: Vec<String> = {
@@ -42,18 +52,10 @@ pub Assign: Expr = {
 };
 
 pub If: Expr = {
-    IF <condition: Condition> THEN <body: Any> END =>
+    IF <condition: MultTerm> THEN <body: Any> END =>
         Expr::If{ condition: Box::new(condition), body: Box::new(body) },
-    IF <condition: Condition> THEN <ifBody: Any> ELSE <elseBody: Any> END =>
-        Expr::IfElse{ condition: Box::new(condition), ifBody: Box::new(ifBody), elseBody: Box::new(elseBody) },
-};
-
-pub Condition: Expr = {
-    <left: Any> IN <right: Any> =>
-        Expr::Condition{ left: Box::new(left), special: Special::In, right: Box::new(right) },
-    EXISTS <right: Condition> =>
-            Expr::ConditionRightSide{ special: Special::Exists, right: Box::new(right) },
-    <s: STRING> => Expr::String(s.to_string()),
+    IF <condition: MultTerm> THEN <if_body: Any> ELSE <else_body: Any> END =>
+        Expr::IfElse{ condition: Box::new(condition), if_body: Box::new(if_body), else_body: Box::new(else_body) },
 };
 
 pub Special: Special = {
@@ -61,9 +63,20 @@ pub Special: Special = {
     EXISTS => Special::Exists,
 }
 
+pub MultTerm: Expr = {
+    <e: Term> => e,
+    <e1: Term> <e2: MultTerm> => Expr::MultipleTerm { t1: Box::new(e1), t2: Box::new(e2) }
+}
+
+pub Term: Expr = {
+    <s: STRING> => Expr::String(s.to_string()),
+    <s: Special> => Expr::Special(s),
+}
+
 match {
     "="     => EQ,
     "upon"  => UPON,
+    "event" => EVENT,
     "do"    => DO,
     ":"     => COLON,
     ","     => COMMA,

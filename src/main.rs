@@ -9,7 +9,6 @@ lalrpop_mod!(pub parser);
 
 #[macro_use] mod latex;
 mod my_parser;
-mod values;
 
 fn main() {
     let mut input = String::new();
