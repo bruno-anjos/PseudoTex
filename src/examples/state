@@ -1,0 +1,7 @@
+state
+	var1
+	var2
+end
+begin
+	var1 = teste
+end
