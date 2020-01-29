@@ -3,6 +3,38 @@ use crate::my_parser::{Expr, Special};
 grammar;
 
 pub Main: Expr = {
+    <s: State> <b: MainBody> => Expr::MultipleExpr{ e1: Box::new(s), e2: Box::new(b) },
+    <b: MainBody> => b,
+};
+
+pub Interface: Expr = {
+    INTERFACE <r: Requests> <i: Indications> END => Expr::Interface{ reqs: Box::new(r), indics: Box::new(i) },
+    INTERFACE <r: Requests> END => Expr::Interface{ reqs: Box::new(r), indics: Box::new(Expr::Empty) },
+    INTERFACE <i: Indications> END => Expr::Interface{ reqs: Box::new(Expr::Empty), indics: Box::new(i) },
+};
+
+pub Requests: Expr = {
+    R <r: MultiCall> => Expr::Requests{ requests: Box::new(r) }
+};
+
+pub Indications: Expr = {
+    I <i: MultiCall> => Expr::Indications{ indications: Box::new(i) }
+};
+
+pub MultiCall: Expr = {
+    <m: MethodCall> => m,
+    <m: MethodCall> <ms: MultiCall> => Expr::MultipleExpr{ e1: Box::new(m), e2: Box::new(ms) },
+};
+
+pub MethodCall: Expr = {
+    <s: STRING> OPEN_PAR <args: Args> CLOSE_PAR => Expr::MethodCall{ name: s.to_string(), args: args }
+};
+
+pub State: Expr = {
+    STATE <e: MultiLineMultiTerm> END => Expr::State{ body: Box::new(e) }
+};
+
+pub MainBody: Expr = {
     BEGIN <e:Any> END => e
 };
 
@@ -52,26 +84,31 @@ pub Assign: Expr = {
 };
 
 pub If: Expr = {
-    IF <condition: MultTerm> THEN <body: Any> END =>
+    IF <condition: SingleLineMultiTerm> THEN <body: Any> END =>
         Expr::If{ condition: Box::new(condition), body: Box::new(body) },
-    IF <condition: MultTerm> THEN <if_body: Any> ELSE <else_body: Any> END =>
+    IF <condition: SingleLineMultiTerm> THEN <if_body: Any> ELSE <else_body: Any> END =>
         Expr::IfElse{ condition: Box::new(condition), if_body: Box::new(if_body), else_body: Box::new(else_body) },
 };
 
 pub Special: Special = {
     IN => Special::In,
     EXISTS => Special::Exists,
-}
+};
 
-pub MultTerm: Expr = {
+pub MultiLineMultiTerm: Expr = {
     <e: Term> => e,
-    <e1: Term> <e2: MultTerm> => Expr::MultipleTerm { t1: Box::new(e1), t2: Box::new(e2) }
-}
+    <e1: Term> <e2: MultiLineMultiTerm> => Expr::MultiLineMultipleTerm { t1: Box::new(e1), t2: Box::new(e2) }
+};
+
+pub SingleLineMultiTerm: Expr = {
+    <e: Term> => e,
+    <e1: Term> <e2: SingleLineMultiTerm> => Expr::SingleLineMultipleTerm { t1: Box::new(e1), t2: Box::new(e2) }
+};
 
 pub Term: Expr = {
     <s: STRING> => Expr::String(s.to_string()),
     <s: Special> => Expr::Special(s),
-}
+};
 
 match {
     "="     => EQ,
@@ -82,6 +119,10 @@ match {
     ","     => COMMA,
     "("     => OPEN_PAR,
     ")"     => CLOSE_PAR,
+    "state" => STATE,
+    "interface" => INTERFACE,
+    "r"     => R,
+    "i"     => I,
     "begin" => BEGIN,
     "end"   => END,
     "in"    => IN,

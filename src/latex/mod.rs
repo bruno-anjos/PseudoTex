@@ -64,3 +64,32 @@ macro_rules! IF_CODE {
 macro_rules! IF_ELSE_CODE {
     () => ("\\eIf{{{}}}{{{}}}{{{}}}");
 }
+
+macro_rules! STATE_CODE {
+    () => ("\\SetKwIF{{State}}{{}}{{}}{{State}}{{:}}{{}}{{}}{{}}
+    \\State{{}}{{{}}}\n");
+}
+
+macro_rules! REQUESTS_CODE {
+    () => ("\\SetKwIF{{Requests}}{{}}{{}}{{Requests}}{{:}}{{}}{{}}{{}}
+    \\Requests{{}}{{{}}}\n");
+}
+
+macro_rules! INDICATIONS_CODE {
+    () => ("\\SetKwIF{{Indications}}{{}}{{}}{{Indications}}{{:}}{{}}{{}}{{}}
+    \\Indications{{}}{{{}}}\n");
+}
+
+macro_rules! INTERFACE_CODE {
+    () => ("\\SetKwIF{{Interface}}{{}}{{}}{{Interface}}{{:}}{{}}{{}}{{}}
+    \\Interface{{}}{{\
+    {}\\;\n\
+    \\blankline
+    {}\n\
+    }}\n");
+}
+
+macro_rules! METHOD_CALL_CODE {
+    () => ("\\FuncSty{{{}}}\\ArgSty{{{}}}\\FuncSty{{}}");
+}
+
