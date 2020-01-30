@@ -1,0 +1,14 @@
+interface
+	r
+	fp2pSend(p,m)
+	i
+	fp2pDeliver(s,m)
+end
+begin
+	upon fp2pSend(p, m) do:
+		teste = falso
+	end
+	upon Receive(DATA, s, m) do:
+		teste = true
+	end
+end

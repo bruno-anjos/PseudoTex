@@ -3,9 +3,11 @@ macro_rules! BEGIN {
     \\usepackage[utf8]{inputenc}\n\
     \\usepackage[ruled,vlined,linesnumbered]{algorithm2e}\n\
     \\begin{document}\n\
-    \\begin{algorithm}[H]\n\
-    \\DontPrintSemicolon\n\
-    \\SetAlgoLined\n")
+    {{\\DontPrintSemicolon\n\
+    \\SetAlgoNoLine\n\
+    \\LinesNumberedHidden\n\
+    \\SetFuncSty{textbf}\n\
+    \\begin{algorithm}[ht]\n")
 }
 
 macro_rules! END {
@@ -84,12 +86,11 @@ macro_rules! INTERFACE_CODE {
     () => ("\\SetKwIF{{Interface}}{{}}{{}}{{Interface}}{{:}}{{}}{{}}{{}}
     \\Interface{{}}{{\
     {}\\;\n\
-    \\blankline
     {}\n\
     }}\n");
 }
 
 macro_rules! METHOD_CALL_CODE {
-    () => ("\\FuncSty{{{}}}\\ArgSty{{{}}}\\FuncSty{{}}");
+    () => ("\\FuncSty{{{}(}}\\ArgSty{{{}}}\\FuncSty{{)}}");
 }
 

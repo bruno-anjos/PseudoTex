@@ -3,7 +3,7 @@ pub enum Expr {
     MultipleExpr { e1: Box<Expr>, e2: Box<Expr> },
     SingleLineMultipleTerm { t1: Box<Expr>, t2: Box<Expr> },
     MultiLineMultipleTerm { t1: Box<Expr>, t2: Box<Expr> },
-    Assign { name: String, value: String },
+    Assign { name: String, value: Box<Expr> },
     Method { name: String, body: Box<Expr> },
     MethodWithArgs { name: String, args: Vec<String>, body: Box<Expr> },
     Event { name: String, body: Box<Expr> },
@@ -34,7 +34,7 @@ impl Translate for Expr {
     fn eval_translate(self) -> String {
         match self {
             Expr::Assign { name, value } =>
-                format!(ASSIGN_CODE!(), name, value),
+                format!(ASSIGN_CODE!(), name, value.eval_translate()),
             Expr::MultipleExpr { e1, e2 } =>
                 format!(
                     "{}\n\\;{}\n",

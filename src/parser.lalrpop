@@ -4,6 +4,17 @@ grammar;
 
 pub Main: Expr = {
     <s: State> <b: MainBody> => Expr::MultipleExpr{ e1: Box::new(s), e2: Box::new(b) },
+    <i: Interface> <b: MainBody> => Expr::MultipleExpr{ e1: Box::new(i), e2: Box::new(b) },
+    <i: Interface> <s: State> <b: MainBody> =>
+        Expr::MultipleExpr{
+            e1: Box::new(
+                Expr::MultipleExpr{
+                    e1: Box::new(i),
+                    e2: Box::new(s)
+                }
+            ),
+            e2: Box::new(b)
+        },
     <b: MainBody> => b,
 };
 
@@ -80,7 +91,8 @@ pub Args: Vec<String> = {
 };
 
 pub Assign: Expr = {
-    <id:STRING> EQ <value:STRING> => Expr::Assign{ name: id.to_string(), value: value.to_string() }
+    <id:STRING> EQ <value:STRING> => Expr::Assign{ name: id.to_string(), value: Box::new(Expr::String(value.to_string())) },
+    <id:STRING> EQ <value:MethodCall> => Expr::Assign{ name: id.to_string(), value: Box::new(value) }
 };
 
 pub If: Expr = {
