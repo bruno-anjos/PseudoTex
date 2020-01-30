@@ -42,6 +42,10 @@ PseudoTex supports:
 * if
 * if/else
 * events
+* state
+* interface
+    + requests
+    + indications
 * special symbols:
 	+ in
 	+ exists
@@ -52,13 +56,13 @@ PseudoTex supports:
 * Add if/else if
 * Add if/else if/else
 * Add triggers
-* Add state
 * Add init
 * Add procedures
-* Add interface
-    + Add requests
-    + Add indications
+* Add symbols
+    + undefined value
 * Add binaries to github
+* Add tests
+* Add test automation per commit
 
 ## Contributing
 
