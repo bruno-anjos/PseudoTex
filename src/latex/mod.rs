@@ -7,11 +7,17 @@ macro_rules! BEGIN {
     \\SetAlgoNoLine\n\
     \\LinesNumberedHidden\n\
     \\SetFuncSty{textbf}\n\
-    \\begin{algorithm}[ht]\n")
+    \\begin{algorithm}[ht]\n\
+    \\BlankLine\n\
+    \\BlankLine\n\
+    \\BlankLine\n")
 }
 
 macro_rules! END {
-    () => ("\\end{algorithm}\n\
+    () => ("\\BlankLine\n\
+    \\BlankLine\n\
+    \\BlankLine\n\
+    \\end{algorithm}\n\
     \\end{document}")
 }
 
