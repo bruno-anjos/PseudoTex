@@ -60,6 +60,14 @@ PseudoTex supports:
 * Add procedures
 * Add symbols
     + undefined value
+    + set operators
+    + not in
+    + not exists
+* Add setup timers
+* Add setup periodic timers
+* Add cancel timers
+* Add cancel timers with args
+* Add foreach
 * Add binaries to github
 * Add tests
 * Add test automation per commit
