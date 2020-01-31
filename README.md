@@ -42,6 +42,7 @@ PseudoTex supports:
 * if
 * if/else
 * events
+* triggers
 * state
 * interface
     + requests
@@ -49,20 +50,18 @@ PseudoTex supports:
 * special symbols:
 	+ in
 	+ exists
+    + set operators
+    + not in
+    + not exists
+    + undefined value
 
 ## TODO
 
 * Add [clap](https://clap.rs)
 * Add if/else if
 * Add if/else if/else
-* Add triggers
 * Add init
 * Add procedures
-* Add symbols
-    + undefined value
-    + set operators
-    + not in
-    + not exists
 * Add setup timers
 * Add setup periodic timers
 * Add cancel timers

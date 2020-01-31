@@ -25,6 +25,12 @@ pub enum Expr {
 pub enum Special {
     In,
     Exists,
+    NotExists,
+    NotIn,
+    SetMinus,
+    Union,
+    Intersect,
+    Undefined
 }
 
 pub trait Translate {
@@ -137,6 +143,12 @@ impl Translate for Special {
         match self {
             Special::Exists => EXISTS_CODE!(),
             Special::In => IN_CODE!(),
+            Special::NotExists => NOT_EXISTS_CODE!(),
+            Special::NotIn => NOT_IN_CODE!(),
+            Special::SetMinus => SET_MINUS_CODE!(),
+            Special::Union => UNION_CODE!(),
+            Special::Intersect => INTERSECT_CODE!(),
+            Special::Undefined => UNDEFINED_CODE!(),
         }.to_string()
     }
 }

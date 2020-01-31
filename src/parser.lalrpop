@@ -110,6 +110,12 @@ pub If: Expr = {
 pub Special: Special = {
     IN => Special::In,
     EXISTS => Special::Exists,
+    NOT_EXISTS => Special::NotExists,
+    NOT_IN => Special::NotIn,
+    SET_MINUS => Special::SetMinus,
+    UNION => Special::Union,
+    INTERSECT => Special::Intersect,
+    UNDEFINED => Special::Undefined,
 };
 
 pub MultiLineMultiTerm: Expr = {
@@ -140,13 +146,19 @@ match {
     "interface" => INTERFACE,
     "r"     => R,
     "i"     => I,
-    "trigger" => TRIGGER,
+    "trigger"   => TRIGGER,
     "begin" => BEGIN,
     "end"   => END,
-    "in"    => IN,
     "if"    => IF,
     "else"  => ELSE,
     "then"  => THEN,
+    "in"    => IN,
     "exists"=> EXISTS,
+    "\\"     => SET_MINUS,
+    "!in"   => NOT_IN,
+    "!exists"   => NOT_EXISTS,
+    "unite" => UNION,
+    "intersect" => INTERSECT,
+    "undefined" => UNDEFINED,
     r"\w+"  => STRING
 }

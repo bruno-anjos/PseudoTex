@@ -2,6 +2,7 @@ macro_rules! BEGIN {
     () => ("\\documentclass{article}\n\
     \\usepackage[utf8]{inputenc}\n\
     \\usepackage[ruled,vlined,linesnumbered]{algorithm2e}\n\
+    \\usepackage{amssymb}\n\
     \\begin{document}\n\
     {{\\DontPrintSemicolon\n\
     \\SetAlgoNoLine\n\
@@ -61,8 +62,32 @@ macro_rules! IN_CODE {
     () => ("$\\in$")
 }
 
+macro_rules! NOT_IN_CODE {
+    () => ("$\\notin$")
+}
+
+macro_rules! SET_MINUS_CODE {
+    () => ("$\\setminus$")
+}
+
+macro_rules! INTERSECT_CODE {
+    () => ("$\\cap$")
+}
+
+macro_rules! UNION_CODE {
+    () => ("$\\cup$")
+}
+
 macro_rules! EXISTS_CODE {
     () => ("$\\exists$")
+}
+
+macro_rules! NOT_EXISTS_CODE {
+    () => ("$\\nexists$")
+}
+
+macro_rules! UNDEFINED_CODE {
+    () => ("$\\bot$")
 }
 
 macro_rules! IF_CODE {

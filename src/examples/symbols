@@ -1,0 +1,6 @@
+state
+    in !in exists !exists unite intersect undefined
+end
+begin
+	a = false
+end
