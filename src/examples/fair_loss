@@ -6,9 +6,9 @@ interface
 end
 begin
 	upon fp2pSend(p, m) do:
-		teste = falso
+		trigger Send(DATA, p, m)
 	end
 	upon Receive(DATA, s, m) do:
-		teste = true
+		trigger fp2pDeliver(s, m)
 	end
 end

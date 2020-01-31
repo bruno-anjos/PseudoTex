@@ -57,7 +57,8 @@ pub Any: Expr = {
 pub BasicExpr: Expr = {
     <e: Method> => e,
     <e: Assign> => e,
-    <e: If> => e
+    <e: If> => e,
+    <e: Trigger> => e,
 };
 
 pub Method: Expr = {
@@ -66,6 +67,10 @@ pub Method: Expr = {
     SimpleEvent,
     ComplexEvent
 };
+
+pub Trigger: Expr = {
+    TRIGGER <m: MethodCall> => Expr::Trigger{ method: Box::new(m) },
+}
 
 pub SimpleMethod: Expr = {
     UPON <id: STRING> DO COLON <e: Any> END => Expr::Method{ name: id.to_string(), body: Box::new(e) }
@@ -135,6 +140,7 @@ match {
     "interface" => INTERFACE,
     "r"     => R,
     "i"     => I,
+    "trigger" => TRIGGER,
     "begin" => BEGIN,
     "end"   => END,
     "in"    => IN,

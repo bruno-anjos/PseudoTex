@@ -17,6 +17,7 @@ pub enum Expr {
     MethodCall { name: String, args: Vec<String>},
     Requests { requests: Box<Expr>},
     Indications { indications: Box<Expr>},
+    Trigger { method: Box<Expr> },
     Empty,
 }
 
@@ -120,6 +121,11 @@ impl Translate for Expr {
                 format!(
                     INDICATIONS_CODE!(),
                     indications.eval_translate()
+                ),
+            Expr::Trigger { method } =>
+                format!(
+                    TRIGGER_CODE!(),
+                    method.eval_translate()
                 ),
             Expr::Empty => String::new()
         }

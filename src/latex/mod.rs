@@ -100,3 +100,6 @@ macro_rules! METHOD_CALL_CODE {
     () => ("\\FuncSty{{{}(}}\\ArgSty{{{}}}\\FuncSty{{)}}");
 }
 
+macro_rules! TRIGGER_CODE {
+    () => ("\\FuncSty{{Trigger}} {}");
+}
