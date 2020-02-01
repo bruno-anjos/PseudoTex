@@ -16,7 +16,7 @@ installed. The following command will create a directory with the repository
 in you current folder.
 
 ```shell
-git clone https://github.com/bruno-anjos/PseudoTex.git
+λ ~/git/ $ git clone https://github.com/bruno-anjos/PseudoTex.git
 ```
 
 This command will create a directory named PseudoTex with the repository's content
@@ -24,17 +24,34 @@ in it.
 
 ### Running
 
-For now since it is still in a very early stage, to run you need to use cargo.
-(If you want to use a file you have to pipe it to stdin for now. I will add
-[clap](https://clap.rs) for command arguments support)
+For now since it is still in a very early stage, to run you need to build the
+project through cargo. There is a symbolic link that aims to the binary created in the
+debug folder.
 
 ```shell
-cargo run < input_file
+λ ~/git/PseudoTex/ $ cargo build
+λ ~/git/PseudoTex/ $ ./pseudotex --help
+PseudoTex 0.1-alpha
+Bruno Anjos <bruno.vale.anjos@gmail.com>
+pseudocode transpiler to latex representation
+
+USAGE:
+    pseudotex [OPTIONS]
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+    -i, --input <input>      file name to read content from
+    -o, --output <output>    file name to write content to
 ```
 
-This will create a `demo.tex` file with the result.
+
 
 ## Features
+
+PseudoTex uses [clap](https://clap.rs) for CLI argument parsing.
 
 PseudoTex supports:
 * functions
@@ -57,7 +74,6 @@ PseudoTex supports:
 
 ## TODO
 
-* Add [clap](https://clap.rs)
 * Add if/else if
 * Add if/else if/else
 * Add init
@@ -67,7 +83,6 @@ PseudoTex supports:
 * Add cancel timers
 * Add cancel timers with args
 * Add foreach
-* Add binaries to github
 * Add tests
 * Add test automation per commit
 
