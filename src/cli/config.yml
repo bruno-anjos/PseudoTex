@@ -1,0 +1,15 @@
+name: PseudoTex
+version: "0.1-alpha"
+author: Bruno Anjos <bruno.vale.anjos@gmail.com>
+about: pseudocode transpiler to latex representation.
+args:
+  - input:
+      help: file name to read content from
+      short: i
+      long: input
+      takes_value: true
+  - output:
+      help: file name to write content to
+      short: o
+      long: output
+      takes_value: true

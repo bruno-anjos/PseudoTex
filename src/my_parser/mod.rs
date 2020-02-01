@@ -14,9 +14,9 @@ pub enum Expr {
     Special(Special),
     State { body: Box<Expr> },
     Interface { reqs: Box<Expr>, indics: Box<Expr> },
-    MethodCall { name: String, args: Vec<String>},
-    Requests { requests: Box<Expr>},
-    Indications { indications: Box<Expr>},
+    MethodCall { name: String, args: Vec<String> },
+    Requests { requests: Box<Expr> },
+    Indications { indications: Box<Expr> },
     Trigger { method: Box<Expr> },
     Empty,
 }
@@ -30,7 +30,7 @@ pub enum Special {
     SetMinus,
     Union,
     Intersect,
-    Undefined
+    Undefined,
 }
 
 pub trait Translate {
@@ -86,7 +86,7 @@ impl Translate for Expr {
                     args.join(", "),
                     body.eval_translate()
                 ),
-            Expr::MethodCall { name, args} =>
+            Expr::MethodCall { name, args } =>
                 format!(
                     METHOD_CALL_CODE!(),
                     name,
