@@ -85,6 +85,7 @@ PseudoTex supports:
 * Add foreach
 * Add tests
 * Add test automation per commit
+* Add subscript
 
 ## Contributing
 
