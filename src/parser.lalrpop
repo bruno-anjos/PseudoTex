@@ -46,7 +46,15 @@ pub State: Expr = {
 };
 
 pub MainBody: Expr = {
-    <e:TopLevel> => e
+	<e: Init> => e,
+	<e:TopLevel> => e,
+	<e1: Init> <e2:TopLevel> => Expr::MultipleExpr{ e1: Box::new(e1), e2: Box::new(e2) }
+};
+
+pub Init: Expr = {
+	UPON INIT DO COLON <body: MultiBody> => Expr::Init{ body: Box::new(body)},
+	UPON INIT OPEN_PAR <args: Args> CLOSE_PAR DO COLON <e: MultiBody> =>
+        Expr::InitWithArgs{ args: args, body: Box::new(e) }
 };
 
 pub TopLevel: Expr = {
@@ -199,7 +207,8 @@ match {
     "elif"  => ELIF,
     "then"  => THEN,
     "in"    => IN,
-    "exists"=> EXISTS,
+	"exists"=> EXISTS,
+	"init" => INIT,
     "\\"     => SET_MINUS,
     "!in"   => NOT_IN,
     "!exists"   => NOT_EXISTS,

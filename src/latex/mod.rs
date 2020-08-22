@@ -30,6 +30,22 @@ macro_rules! FUNCTION_CODE {
     }}")
 }
 
+macro_rules! INIT_CODE {
+    () => ("\\SetKwFunction{{FunctionID}}{{Init}}
+	\\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
+	\\Fn{{\\FunctionID}}{{
+		{}
+	}}");
+}
+
+macro_rules! INIT_WITH_ARGS_CODE {
+    () => ("\\SetKwFunction{{FunctionID}}{{Init}}\n\
+    \\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
+    \\Fn{{\\FunctionID{{{}}}}}{{\n\
+        {}\n
+    }}")
+}
+
 macro_rules! EVENT_CODE {
     () => ("\\SetKwFunction{{FunctionID}}{{{}}}\n\
     \\SetKwProg{{Fn}}{{Upon event }}{{ do:}}{{}}\n\
