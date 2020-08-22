@@ -57,7 +57,7 @@ pub Any: Expr = {
 pub BasicExpr: Expr = {
     <e: Method> => e,
     <e: Assign> => e,
-    <e: If> => e,
+    <e: Conditional> => e,
     <e: Trigger> => e,
 };
 
@@ -100,11 +100,39 @@ pub Assign: Expr = {
     <id:STRING> EQ <value:MethodCall> => Expr::Assign{ name: id.to_string(), value: Box::new(value) }
 };
 
-pub If: Expr = {
-    IF <condition: SingleLineMultiTerm> THEN <body: Any> END =>
-        Expr::If{ condition: Box::new(condition), body: Box::new(body) },
-    IF <condition: SingleLineMultiTerm> THEN <if_body: Any> ELSE <else_body: Any> END =>
-        Expr::IfElse{ condition: Box::new(condition), if_body: Box::new(if_body), else_body: Box::new(else_body) },
+pub Conditional: Expr = {
+	IF <condition: SingleLineMultiTerm> THEN <body: Any> END =>
+		Expr::If{ condition: Box::new(condition), body: Box::new(body) },
+	IF <condition: SingleLineMultiTerm> THEN <body: Any> <next_conditional: NextConditional> END =>
+		Expr::IfComposed{ condition: Box::new(condition), body: Box::new(body), next_conditional: Box::new(next_conditional) },
+};
+
+pub NextConditional: Expr = {
+	<e: SimpleNextConditional> => e,
+	<e: ComposedNextConditionals> => e,
+};
+
+pub SimpleNextConditional: Expr = {
+	<e: ElseIf> => e,
+	<e: Else> => e
+};
+
+pub ComposedNextConditionals: Expr = {
+	<e: ElseIfComposed> => e,
+};
+
+pub ElseIf: Expr = {
+	ELSE IF <condition: SingleLineMultiTerm> THEN <else_if_body: Any> =>
+		Expr::IfElse{ condition: Box::new(condition), else_if_body: Box::new(else_if_body) }
+};
+
+pub ElseIfComposed: Expr = {
+	ELSE IF <condition: SingleLineMultiTerm> THEN <else_if_body: Any> <next_conditional: NextConditional> =>
+		Expr::IfElse{ condition: Box::new(condition), else_if_body: Box::new(else_if_body), next_conditional: Box::new(next_conditional) }
+};
+
+pub Else: Expr = {
+	ELSE THEN <else_body:Any> => Expr::Else{else_body: Box::new(else_body)}
 };
 
 pub Special: Special = {
