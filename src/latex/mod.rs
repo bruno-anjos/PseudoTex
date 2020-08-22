@@ -62,6 +62,30 @@ macro_rules! TIMER_WITH_ARGS_CODE {
     }}")
 }
 
+macro_rules! CRASH_WITH_ARGS_CODE {
+    () => ("\\SetKwFunction{{FunctionID}}{{Crash}}\n\
+    \\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
+    \\Fn{{\\FunctionID{{{}}}}}{{\n\
+        {}\n
+    }}")
+}
+
+macro_rules! PROCEDURE_CODE {
+    () => ("\\SetKwFunction{{FunctionID}}{{{}}}\n\
+    \\SetKwProg{{Fn}}{{Procedure }}{{:}}{{}}\n\
+    \\Fn{{\\FunctionID}}{{\n\
+        {}\n
+    }}")
+}
+
+macro_rules! PROCEDURE_WITH_ARGS_CODE {
+    () => ("\\SetKwFunction{{FunctionID}}{{{}}}\n\
+    \\SetKwProg{{Fn}}{{Procedure }}{{:}}{{}}\n\
+    \\Fn{{\\FunctionID{{{}}}}}{{\n\
+        {}\n
+    }}")
+}
+
 macro_rules! EVENT_CODE {
     () => ("\\SetKwFunction{{FunctionID}}{{{}}}\n\
     \\SetKwProg{{Fn}}{{Upon event }}{{ do:}}{{}}\n\
@@ -176,7 +200,19 @@ macro_rules! INTERFACE_CODE {
 }
 
 macro_rules! METHOD_CALL_CODE {
+    () => ("\\FuncSty{{{}(}}\\ArgSty{{}}\\FuncSty{{)}}");
+}
+
+macro_rules! METHOD_CALL_WITH_ARGS_CODE {
     () => ("\\FuncSty{{{}(}}\\ArgSty{{{}}}\\FuncSty{{)}}");
+}
+
+macro_rules! PROCEDURE_CALL_CODE {
+    () => ("\\FuncSty{{Call {}(}}\\ArgSty{{}}\\FuncSty{{)}}");
+}
+
+macro_rules! PROCEDURE_CALL_WITH_ARGS_CODE {
+    () => ("\\FuncSty{{Call {}(}}\\ArgSty{{{}}}\\FuncSty{{)}}");
 }
 
 macro_rules! TRIGGER_CODE {

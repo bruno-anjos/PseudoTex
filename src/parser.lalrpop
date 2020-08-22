@@ -38,7 +38,10 @@ pub MultiCall: Expr = {
 };
 
 pub MethodCall: Expr = {
-    <s: STRING> OPEN_PAR <args: Args> CLOSE_PAR => Expr::MethodCall{ name: s.to_string(), args: args }
+    <s: STRING> OPEN_PAR CLOSE_PAR => Expr::MethodCall{ name: s.to_string() },
+    <s: STRING> OPEN_PAR <args: Args> CLOSE_PAR => Expr::MethodCallWithArgs{ name: s.to_string(), args: args },
+	CALL <s: STRING> OPEN_PAR CLOSE_PAR => Expr::ProcedureCall{ name: s.to_string() },
+	CALL <s: STRING> OPEN_PAR <args: Args> CLOSE_PAR => Expr::ProcedureCallWithArgs{ name: s.to_string(), args: args }
 };
 
 pub State: Expr = {
@@ -74,9 +77,18 @@ pub TopLevel: Expr = {
     <b: BasicExpr> <e: TopLevel> => Expr::MultipleExpr{ e1: Box::new(b), e2: Box::new(e) }
 };
 
+pub Procedure: Expr = {
+	PROCEDURE <id: STRING> COLON <body: MultiBody> => 
+		Expr::Procedure{ name: id.to_string(), body: Box::new(body) },
+	PROCEDURE <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR COLON <body: MultiBody> => 
+		Expr::ProcedureWithArgs{ name: id.to_string(), args: args, body: Box::new(body) },
+};
+
 pub BasicExpr: Expr = {
 	<e: Method> => e,
 	<e: Timer> => e,
+	<e: CrashWithArgs> => e,
+	<e: Procedure> => e,
 };
 
 pub MultiBody: Expr = {
@@ -87,7 +99,8 @@ pub MultiBody: Expr = {
 pub Body: Expr = {
 	<e: Assign> => e,
 	<e: Conditional> => e,
-    <e: Trigger> => e,
+	<e: Trigger> => e,
+	<e: MethodCall> => e,
 };
 
 pub Method: Expr = {
@@ -224,10 +237,12 @@ match {
 	"init" => INIT,
 	"timer" => TIMER,
 	"crash" => CRASH,
+	"procedure" => PROCEDURE,
+	"call" => CALL,
     "\\"     => SET_MINUS,
     "!in"   => NOT_IN,
     "!exists"   => NOT_EXISTS,
-    "unite" => UNION,
+	"unite" => UNION,
     "intersect" => INTERSECT,
     "undefined" => UNDEFINED,
     r"\w+"  => STRING

@@ -53,7 +53,20 @@ pub enum Expr {
 		name: String,
 		args: Vec<String>,
         body: Box<Expr>,
-    },
+	},
+	CrashWithArgs{
+		args: Vec<String>,
+		body: Box<Expr>,
+	},
+	Procedure{
+		name: String,
+		body: Box<Expr>,
+	},
+	ProcedureWithArgs{
+		name: String,
+		args: Vec<String>,
+		body: Box<Expr>,
+	},
     If {
         condition: Box<Expr>,
         body: Box<Expr>,
@@ -83,6 +96,16 @@ pub enum Expr {
         indics: Box<Expr>,
     },
     MethodCall {
+        name: String,
+	},
+	MethodCallWithArgs {
+        name: String,
+        args: Vec<String>,
+	},
+	ProcedureCall {
+        name: String,
+	},
+	ProcedureCallWithArgs {
         name: String,
         args: Vec<String>,
     },
@@ -144,7 +167,10 @@ impl Translate for Expr {
                 args.join(", "),
                 body.eval_translate()
             ),
-            Expr::MethodCall { name, args } => format!(METHOD_CALL_CODE!(), name, args.join(", ")),
+			Expr::MethodCall { name} => format!(METHOD_CALL_CODE!(), name),
+			Expr::MethodCallWithArgs { name, args } => format!(METHOD_CALL_WITH_ARGS_CODE!(), name, args.join(", ")),
+			Expr::ProcedureCall { name } => format!(PROCEDURE_CALL_CODE!(), name),
+			Expr::ProcedureCallWithArgs { name, args } => format!(PROCEDURE_CALL_WITH_ARGS_CODE!(), name, args.join(", ")),
             Expr::String(s) => s,
             Expr::Special(s) => s.eval_translate(),
             Expr::If { condition, body } => format!(
@@ -190,6 +216,22 @@ impl Translate for Expr {
 			),
 			Expr::TimerWithArgs{name, args, body} => format!(
 				TIMER_WITH_ARGS_CODE!(),
+				name,
+				args.join(", "),
+				body.eval_translate()
+			),
+			Expr::CrashWithArgs{args, body} => format!(
+				CRASH_WITH_ARGS_CODE!(),
+				args.join(", "),
+				body.eval_translate()
+			),
+			Expr::Procedure{name, body} => format!(
+				PROCEDURE_CODE!(),
+				name,
+				body.eval_translate()
+			),
+			Expr::ProcedureWithArgs{name, args, body} => format!(
+				PROCEDURE_WITH_ARGS_CODE!(),
 				name,
 				args.join(", "),
 				body.eval_translate()
