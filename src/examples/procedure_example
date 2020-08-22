@@ -1,8 +1,8 @@
 procedure test1:
-	ola = falso
+	ola = falso;
 
 procedure test2(arg1, arg2):
-	call test1()
+	call test1();
 
 procedure test3(arg1, arg2):
-	call test2(arg1, arg2)
+	call test2(arg1, arg2);

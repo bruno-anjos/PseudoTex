@@ -1,6 +1,10 @@
+state:
+    in !in exists !exists unite intersect undefined { } [ ]
 upon teste(arg1, arg2) do:
 	ola = falso;
 	teste = falso;
 	if a in set then
 		ola = true;
 	end
+	ola[teste] = a;
+	

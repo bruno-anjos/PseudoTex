@@ -1,11 +1,11 @@
 upon init do:
-	setup timer timer1(t)
-	setup periodic timer timer2(t, arg1, arg2)
-	cancel timer timer1
-	cancel timer timer2
+	setup timer timer1(t);
+	setup periodic timer timer2(t, arg1, arg2);
+	cancel timer timer1;
+	cancel timer timer2;
 
 upon timer timer1 do:
-	ola = falso
+	ola = falso;
 
 upon timer timer2(arg) do:
-	ola = arg
+	ola = arg;
