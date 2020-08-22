@@ -101,6 +101,10 @@ pub enum Expr {
 		name: String,
 		args: Vec<String>,
 	},
+	ForEach{
+		condition: Box<Expr>,
+		body: Box<Expr>,
+	},
     String(String),
     Special(Special),
     State {
@@ -269,6 +273,11 @@ impl Translate for Expr {
 				CANCEL_TIMER_WITH_ARGS_CODE!(),
 				name,
 				args.join(", "),
+			),
+			Expr::ForEach{condition, body} => format!(
+				FOREACH_CODE!(),
+				condition.eval_translate(),
+				body.eval_translate(),
 			),
             Expr::State { body } => format!(STATE_CODE!(), body.eval_translate()),
             Expr::Interface { reqs, indics } => format!(

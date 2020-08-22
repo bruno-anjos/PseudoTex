@@ -110,6 +110,11 @@ pub MultiBody: Expr = {
 	<e1: Body> <e2: MultiBody> => Expr::MultipleExpr{ e1: Box::new(e1), e2: Box::new(e2) }
 };
 
+pub ForEach: Expr = {
+	FOREACH <condition: SingleLineMultiTerm> DO COLON <body: MultiBody> END =>
+		Expr::ForEach{ condition: Box::new(condition), body: Box::new(body) }
+};
+
 pub Body: Expr = {
 	<e: Assign> => e,
 	<e: Conditional> => e,
@@ -117,6 +122,7 @@ pub Body: Expr = {
 	<e: MethodCall> => e,
 	<e: SetupTimer> => e,
 	<e: CancelTimer> => e,
+	<e: ForEach> => e,
 };
 
 pub Method: Expr = {
@@ -258,6 +264,7 @@ match {
 	"setup" => SETUP,
 	"periodic" => PERIODIC,
 	"cancel" => CANCEL,
+	"for each" => FOREACH,
     "\\"     => SET_MINUS,
     "!in"   => NOT_IN,
     "!exists"   => NOT_EXISTS,

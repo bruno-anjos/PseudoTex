@@ -46,6 +46,10 @@ macro_rules! INIT_WITH_ARGS_CODE {
     }}")
 }
 
+macro_rules! FOREACH_CODE {
+	() => ("\\ForEach{{{}}}{{{}}}")
+}
+
 macro_rules! TIMER_CODE {
     () => ("\\SetKwFunction{{FunctionID}}{{Timer {}}}
 	\\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
