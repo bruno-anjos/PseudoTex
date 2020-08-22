@@ -1,0 +1,5 @@
+upon timer timer1 do:
+	ola = falso
+
+upon timer timer2(arg) do:
+	ola = arg
