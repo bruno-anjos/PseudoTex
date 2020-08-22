@@ -67,6 +67,11 @@ PseudoTex supports:
 * if/else if/else (__WIP__)
 * events
 * triggers
+* procedures
+* setup timers
+* setup periodic timers
+* cancel timers
+* cancel timers with args
 * special symbols:
 	+ in
 	+ exists
@@ -77,11 +82,6 @@ PseudoTex supports:
 
 ## TODO
 
-* Add procedures
-* Add setup timers
-* Add setup periodic timers
-* Add cancel timers
-* Add cancel timers with args
 * Add foreach
 * Add tests
 * Add test automation per commit
