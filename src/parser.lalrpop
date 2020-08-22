@@ -116,14 +116,18 @@ pub ForEach: Expr = {
 };
 
 pub Body: Expr = {
-	<e: Assign> => e,
 	<e: Conditional> => e,
-	<e: Trigger> => e,
-	<e: MethodCall> => e,
-	<e: SetupTimer> => e,
-	<e: CancelTimer> => e,
 	<e: ForEach> => e,
+	<e: BodyLine> => e,
 };
+
+pub BodyLine: Expr = {
+	<e: Assign> SEMI_COLON => e,
+	<e: Trigger> SEMI_COLON => e,
+	<e: MethodCall> SEMI_COLON => e,
+	<e: SetupTimer> SEMI_COLON => e,
+	<e: CancelTimer> SEMI_COLON => e,
+}
 
 pub Method: Expr = {
     SimpleMethod,
@@ -160,8 +164,8 @@ pub Args: Vec<String> = {
 };
 
 pub Assign: Expr = {
-    <id:STRING> EQ <value:STRING> => Expr::Assign{ name: id.to_string(), value: Box::new(Expr::String(value.to_string())) },
-    <id:STRING> EQ <value:MethodCall> => Expr::Assign{ name: id.to_string(), value: Box::new(value) }
+    <id: SingleLineMultiTermNoSpace> EQ <value: SingleLineMultiTermNoSpace> => Expr::Assign{ name: Box::new(id), value: Box::new(value) },
+    <id: SingleLineMultiTermNoSpace> EQ <value: MethodCall> => Expr::Assign{ name: Box::new(id), value: Box::new(value) }
 };
 
 pub Conditional: Expr = {
@@ -216,7 +220,11 @@ pub Special: Special = {
     SET_MINUS => Special::SetMinus,
     UNION => Special::Union,
     INTERSECT => Special::Intersect,
-    UNDEFINED => Special::Undefined,
+	UNDEFINED => Special::Undefined,
+	OPEN_BRA => Special::OpenBra,
+	CLOSE_BRA => Special::CloseBra,
+	OPEN_CURLY_BRA => Special::OpenCurlyBra,
+	CLOSE_CURLY_BRA => Special::CloseCurlyBra,
 };
 
 pub MultiLineMultiTerm: Expr = {
@@ -227,6 +235,11 @@ pub MultiLineMultiTerm: Expr = {
 pub SingleLineMultiTerm: Expr = {
     <e: Term> => e,
     <e1: Term> <e2: SingleLineMultiTerm> => Expr::SingleLineMultipleTerm { t1: Box::new(e1), t2: Box::new(e2) }
+};
+
+pub SingleLineMultiTermNoSpace: Expr = {
+    <e: Term> => e,
+    <e1: Term> <e2: SingleLineMultiTermNoSpace> => Expr::SingleLineMultipleTermNoSpace { t1: Box::new(e1), t2: Box::new(e2) }
 };
 
 pub Term: Expr = {
@@ -243,6 +256,10 @@ match {
     ","     => COMMA,
     "("     => OPEN_PAR,
     ")"     => CLOSE_PAR,
+    "["     => OPEN_BRA,
+    "]"     => CLOSE_BRA,
+    "{"     => OPEN_CURLY_BRA,
+    "}"     => CLOSE_CURLY_BRA,
     "state" => STATE,
     "interface" => INTERFACE,
     "requests"    => REQUESTS,
@@ -266,10 +283,11 @@ match {
 	"cancel" => CANCEL,
 	"for each" => FOREACH,
     "\\"     => SET_MINUS,
-    "!in"   => NOT_IN,
+	"!in"   => NOT_IN,
+	";" => SEMI_COLON,
     "!exists"   => NOT_EXISTS,
 	"unite" => UNION,
     "intersect" => INTERSECT,
-    "undefined" => UNDEFINED,
+	"undefined" => UNDEFINED,
     r"\w+"  => STRING
 }

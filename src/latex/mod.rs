@@ -238,3 +238,19 @@ macro_rules! PROCEDURE_CALL_WITH_ARGS_CODE {
 macro_rules! TRIGGER_CODE {
     () => ("\\FuncSty{{Trigger}} {}");
 }
+
+macro_rules! OPEN_BRA_CODE {
+	() => ("[");
+}
+
+macro_rules! CLOSE_BRA_CODE {
+	() => ("]");
+}
+
+macro_rules! OPEN_CURLY_BRA_CODE {
+	() => ("\\{");
+}
+
+macro_rules! CLOSE_CURLY_BRA_CODE {
+	() => ("\\}");
+}

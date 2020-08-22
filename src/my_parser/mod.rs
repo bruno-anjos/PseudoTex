@@ -11,13 +11,17 @@ pub enum Expr {
     SingleLineMultipleTerm {
         t1: Box<Expr>,
         t2: Box<Expr>,
+	},
+	SingleLineMultipleTermNoSpace {
+        t1: Box<Expr>,
+        t2: Box<Expr>,
     },
     MultiLineMultipleTerm {
         t1: Box<Expr>,
         t2: Box<Expr>,
     },
     Assign {
-        name: String,
+        name: Box<Expr>,
         value: Box<Expr>,
     },
     Method {
@@ -149,7 +153,11 @@ pub enum Special {
     SetMinus,
     Union,
     Intersect,
-    Undefined,
+	Undefined,
+	OpenBra,
+	CloseBra,
+	OpenCurlyBra,
+	CloseCurlyBra,
 }
 
 pub trait Translate {
@@ -159,7 +167,7 @@ pub trait Translate {
 impl Translate for Expr {
     fn eval_translate(self) -> String {
         match self {
-            Expr::Assign { name, value } => format!(ASSIGN_CODE!(), name, value.eval_translate()),
+            Expr::Assign { name, value } => format!(ASSIGN_CODE!(), name.eval_translate(), value.eval_translate()),
             Expr::MultipleExpr { e1, e2 } => {
                 format!("{}\n\\;{}\n", e1.eval_translate(), e2.eval_translate())
             }
@@ -171,6 +179,9 @@ impl Translate for Expr {
             }
             Expr::SingleLineMultipleTerm { t1, t2 } => {
                 format!("{} {}", t1.eval_translate(), t2.eval_translate())
+			}
+			Expr::SingleLineMultipleTermNoSpace { t1, t2 } => {
+                format!("{}{}", t1.eval_translate(), t2.eval_translate())
             }
             Expr::Method { name, body } => format!(FUNCTION_CODE!(), name, body.eval_translate()),
             Expr::MethodWithArgs { name, args, body } => format!(
@@ -306,6 +317,10 @@ impl Translate for Special {
             Special::Union => UNION_CODE!(),
             Special::Intersect => INTERSECT_CODE!(),
             Special::Undefined => UNDEFINED_CODE!(),
+            Special::OpenBra => OPEN_BRA_CODE!(),
+            Special::CloseBra => CLOSE_BRA_CODE!(),
+            Special::OpenCurlyBra => OPEN_CURLY_BRA_CODE!(),
+            Special::CloseCurlyBra => CLOSE_CURLY_BRA_CODE!(),
         }
         .to_string()
     }
