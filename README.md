@@ -68,6 +68,7 @@ PseudoTex supports:
 * events
 * triggers
 * procedures
+* foreach
 * setup timers
 * setup periodic timers
 * cancel timers
@@ -82,7 +83,6 @@ PseudoTex supports:
 
 ## TODO
 
-* Add foreach
 * Add tests
 * Add test automation per commit
 * Add subscript
