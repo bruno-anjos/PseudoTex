@@ -84,6 +84,20 @@ pub Procedure: Expr = {
 		Expr::ProcedureWithArgs{ name: id.to_string(), args: args, body: Box::new(body) },
 };
 
+pub SetupTimer: Expr = {
+	SETUP TIMER <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR =>
+		Expr::SetupTimer{ name: id.to_string(), args: args },
+	SETUP PERIODIC TIMER <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR =>
+		Expr::SetupPeriodicTimer{ name: id.to_string(), args: args }
+};
+
+pub CancelTimer: Expr = {
+	CANCEL TIMER <id: STRING> =>
+		Expr::CancelTimer{ name: id.to_string() },
+	CANCEL PERIODIC TIMER <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR =>
+		Expr::CancelTimerWithArgs{ name: id.to_string(), args: args }
+};
+
 pub BasicExpr: Expr = {
 	<e: Method> => e,
 	<e: Timer> => e,
@@ -101,6 +115,8 @@ pub Body: Expr = {
 	<e: Conditional> => e,
 	<e: Trigger> => e,
 	<e: MethodCall> => e,
+	<e: SetupTimer> => e,
+	<e: CancelTimer> => e,
 };
 
 pub Method: Expr = {
@@ -239,6 +255,9 @@ match {
 	"crash" => CRASH,
 	"procedure" => PROCEDURE,
 	"call" => CALL,
+	"setup" => SETUP,
+	"periodic" => PERIODIC,
+	"cancel" => CANCEL,
     "\\"     => SET_MINUS,
     "!in"   => NOT_IN,
     "!exists"   => NOT_EXISTS,
