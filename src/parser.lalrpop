@@ -57,13 +57,26 @@ pub Init: Expr = {
         Expr::InitWithArgs{ args: args, body: Box::new(e) }
 };
 
+pub Timer: Expr = {
+	UPON TIMER <id: STRING> DO COLON <e: MultiBody> =>
+		Expr::Timer{ name: id.to_string(), body: Box::new(e) },
+	UPON TIMER <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR DO COLON <e: MultiBody> =>
+        Expr::TimerWithArgs{ name: id.to_string(), args: args, body: Box::new(e) }
+};
+
+pub CrashWithArgs: Expr = {
+	UPON CRASH OPEN_PAR <args: Args> CLOSE_PAR DO COLON <body: MultiBody> =>
+		Expr::CrashWithArgs{ args: args, body: Box::new(body)}
+};
+
 pub TopLevel: Expr = {
     <b: BasicExpr> => b,
     <b: BasicExpr> <e: TopLevel> => Expr::MultipleExpr{ e1: Box::new(b), e2: Box::new(e) }
 };
 
 pub BasicExpr: Expr = {
-    <e: Method> => e,
+	<e: Method> => e,
+	<e: Timer> => e,
 };
 
 pub MultiBody: Expr = {
@@ -209,6 +222,8 @@ match {
     "in"    => IN,
 	"exists"=> EXISTS,
 	"init" => INIT,
+	"timer" => TIMER,
+	"crash" => CRASH,
     "\\"     => SET_MINUS,
     "!in"   => NOT_IN,
     "!exists"   => NOT_EXISTS,

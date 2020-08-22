@@ -33,13 +33,29 @@ macro_rules! FUNCTION_CODE {
 macro_rules! INIT_CODE {
     () => ("\\SetKwFunction{{FunctionID}}{{Init}}
 	\\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
-	\\Fn{{\\FunctionID}}{{
-		{}
+	\\Fn{{\\FunctionID}}{{\n\
+		{}\n
 	}}");
 }
 
 macro_rules! INIT_WITH_ARGS_CODE {
     () => ("\\SetKwFunction{{FunctionID}}{{Init}}\n\
+    \\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
+    \\Fn{{\\FunctionID{{{}}}}}{{\n\
+        {}\n
+    }}")
+}
+
+macro_rules! TIMER_CODE {
+    () => ("\\SetKwFunction{{FunctionID}}{{Timer {}}}
+	\\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
+	\\Fn{{\\FunctionID}}{{\n\
+		{}\n
+	}}");
+}
+
+macro_rules! TIMER_WITH_ARGS_CODE {
+    () => ("\\SetKwFunction{{FunctionID}}{{Timer {}}}\n\
     \\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
     \\Fn{{\\FunctionID{{{}}}}}{{\n\
         {}\n

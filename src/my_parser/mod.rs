@@ -44,6 +44,15 @@ pub enum Expr {
 	InitWithArgs {
 		args: Vec<String>,
         body: Box<Expr>,
+	},
+	Timer {
+		name: String,
+        body: Box<Expr>,
+	},
+	TimerWithArgs {
+		name: String,
+		args: Vec<String>,
+        body: Box<Expr>,
     },
     If {
         condition: Box<Expr>,
@@ -171,6 +180,17 @@ impl Translate for Expr {
 			),
 			Expr::InitWithArgs{args, body} => format!(
 				INIT_WITH_ARGS_CODE!(),
+				args.join(", "),
+				body.eval_translate()
+			),
+			Expr::Timer{name, body} => format!(
+				TIMER_CODE!(),
+				name,
+				body.eval_translate()
+			),
+			Expr::TimerWithArgs{name, args, body} => format!(
+				TIMER_WITH_ARGS_CODE!(),
+				name,
 				args.join(", "),
 				body.eval_translate()
 			),
