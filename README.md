@@ -63,8 +63,8 @@ PseudoTex supports:
 * variables
 * if
 * if/else
-* if/else if (__WIP__)
-* if/else if/else (__WIP__)
+* if/else if
+* if/else if/else
 * events
 * triggers
 * procedures
