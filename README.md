@@ -83,6 +83,7 @@ PseudoTex supports:
 
 ## TODO
 
+* Add more symbols
 * Add tests
 * Add test automation per commit
 * Add subscript
