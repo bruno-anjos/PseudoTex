@@ -8,8 +8,11 @@ pub enum Expr {
     MethodWithArgs { name: String, args: Vec<String>, body: Box<Expr> },
     Event { name: String, body: Box<Expr> },
     EventWithArgs { name: String, args: Vec<String>, body: Box<Expr> },
-    If { condition: Box<Expr>, body: Box<Expr> },
-    IfElse { condition: Box<Expr>, if_body: Box<Expr>, else_body: Box<Expr> },
+	If { condition: Box<Expr>, body: Box<Expr> },
+	ElseIf { condition: Box<Expr>, else_if_body: Box<Expr> },
+	Else { else_body: Box<Expr>},
+	IfComposed { condition: Box<Expr>, if_body: Box<Expr>, next_conditional: Box<Expr> },
+	ElseIfComposed {condition: Box<Expr>, else_if_body: Box<Expr>, next_conditional: Box<Expr>},
     String(String),
     Special(Special),
     State { body: Box<Expr> },
@@ -100,13 +103,25 @@ impl Translate for Expr {
                     condition.eval_translate(),
                     body.eval_translate()
                 ),
-            Expr::IfElse { condition, if_body, else_body } =>
+            Expr::ElseIf { condition, else_if_body} =>
                 format!(
                     IF_ELSE_CODE!(),
                     condition.eval_translate(),
                     if_body.eval_translate(),
                     else_body.eval_translate()
-                ),
+				),
+			Expr::Else { else_body} =>
+			format!(
+				// TODO
+			),
+			Expr::IfComposed { condition, if_body, next_conditional } =>
+			format!(
+				// TODO
+			),
+			Expr::ElseIfComposed {condition, else_if_body, next_conditional} =>
+			format!(
+				// TODO
+			),
             Expr::State { body } =>
                 format!(
                     STATE_CODE!(),
