@@ -5,7 +5,7 @@ interface:
 		fp2pDeliver(s,m)
 
 upon fp2pSend(p, m) do:
-	trigger Send(DATA, p, m)
+	trigger Send(DATA, p, m);
 
 upon Receive(DATA, s, m) do:
-	trigger fp2pDeliver(s, m)
+	trigger fp2pDeliver(s, m);
