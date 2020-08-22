@@ -54,6 +54,11 @@ OPTIONS:
 PseudoTex uses [clap](https://clap.rs) for CLI argument parsing.
 
 PseudoTex supports:
+* state
+* interface
+    + requests
+    + indications
+* init
 * functions
 * variables
 * if
@@ -62,10 +67,6 @@ PseudoTex supports:
 * if/else if/else (__WIP__)
 * events
 * triggers
-* state
-* interface
-    + requests
-    + indications
 * special symbols:
 	+ in
 	+ exists
@@ -76,8 +77,6 @@ PseudoTex supports:
 
 ## TODO
 
-
-* Add init
 * Add procedures
 * Add setup timers
 * Add setup periodic timers
