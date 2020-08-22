@@ -19,17 +19,17 @@ pub Main: Expr = {
 };
 
 pub Interface: Expr = {
-    INTERFACE <r: Requests> <i: Indications> END => Expr::Interface{ reqs: Box::new(r), indics: Box::new(i) },
-    INTERFACE <r: Requests> END => Expr::Interface{ reqs: Box::new(r), indics: Box::new(Expr::Empty) },
-    INTERFACE <i: Indications> END => Expr::Interface{ reqs: Box::new(Expr::Empty), indics: Box::new(i) },
+    INTERFACE COLON <r: Requests> <i: Indications> => Expr::Interface{ reqs: Box::new(r), indics: Box::new(i) },
+    INTERFACE COLON <r: Requests> => Expr::Interface{ reqs: Box::new(r), indics: Box::new(Expr::Empty) },
+    INTERFACE COLON <i: Indications> => Expr::Interface{ reqs: Box::new(Expr::Empty), indics: Box::new(i) },
 };
 
 pub Requests: Expr = {
-    R <r: MultiCall> => Expr::Requests{ requests: Box::new(r) }
+    REQUESTS COLON <r: MultiCall> => Expr::Requests{ requests: Box::new(r) }
 };
 
 pub Indications: Expr = {
-    I <i: MultiCall> => Expr::Indications{ indications: Box::new(i) }
+    INDICATIONS COLON <i: MultiCall> => Expr::Indications{ indications: Box::new(i) }
 };
 
 pub MultiCall: Expr = {
@@ -42,22 +42,30 @@ pub MethodCall: Expr = {
 };
 
 pub State: Expr = {
-    STATE <e: MultiLineMultiTerm> END => Expr::State{ body: Box::new(e) }
+    STATE COLON <e: MultiLineMultiTerm> => Expr::State{ body: Box::new(e) }
 };
 
 pub MainBody: Expr = {
-    BEGIN <e:Any> END => e
+    <e:TopLevel> => e
 };
 
-pub Any: Expr = {
+pub TopLevel: Expr = {
     <b: BasicExpr> => b,
-    <b: BasicExpr> <e: Any> => Expr::MultipleExpr{ e1: Box::new(b), e2: Box::new(e) }
+    <b: BasicExpr> <e: TopLevel> => Expr::MultipleExpr{ e1: Box::new(b), e2: Box::new(e) }
 };
 
 pub BasicExpr: Expr = {
     <e: Method> => e,
-    <e: Assign> => e,
-    <e: Conditional> => e,
+};
+
+pub MultiBody: Expr = {
+	<e: Body> => e,
+	<e1: Body> <e2: MultiBody> => Expr::MultipleExpr{ e1: Box::new(e1), e2: Box::new(e2) }
+};
+
+pub Body: Expr = {
+	<e: Assign> => e,
+	<e: Conditional> => e,
     <e: Trigger> => e,
 };
 
@@ -73,20 +81,20 @@ pub Trigger: Expr = {
 }
 
 pub SimpleMethod: Expr = {
-    UPON <id: STRING> DO COLON <e: Any> END => Expr::Method{ name: id.to_string(), body: Box::new(e) }
+    UPON <id: STRING> DO COLON <e: MultiBody> => Expr::Method{ name: id.to_string(), body: Box::new(e) }
 };
 
 pub ComplexMethod: Expr = {
-    UPON <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR DO COLON <e: Any> END =>
+    UPON <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR DO COLON <e: MultiBody> =>
         Expr::MethodWithArgs{ name: id.to_string(), args: args, body: Box::new(e) }
 };
 
 pub SimpleEvent: Expr = {
-    UPON EVENT <id: STRING> DO COLON <e: Any> END => Expr::Event{ name: id.to_string(), body: Box::new(e) }
+    UPON EVENT <id: STRING> DO COLON <e: MultiBody> => Expr::Event{ name: id.to_string(), body: Box::new(e) }
 };
 
 pub ComplexEvent: Expr = {
-    UPON EVENT <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR DO COLON <e: Any> END =>
+    UPON EVENT <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR DO COLON <e: MultiBody> =>
         Expr::EventWithArgs{ name: id.to_string(), args: args, body: Box::new(e) }
 };
 
@@ -107,12 +115,12 @@ pub Conditional: Expr = {
 };
 
 pub If: Expr = {
-	IF <condition: SingleLineMultiTerm> THEN <body: Any> =>
+	IF <condition: SingleLineMultiTerm> THEN <body: MultiBody> =>
 		Expr::If{ condition: Box::new(condition), body: Box::new(body) },
 };
 
 pub IfComposed: Expr = {
-	IF <condition: SingleLineMultiTerm> THEN <body: Any> =>
+	IF <condition: SingleLineMultiTerm> THEN <body: MultiBody> =>
 		Expr::IfComposed{ condition: Box::new(condition), if_body: Box::new(body) },
 };
 
@@ -131,17 +139,17 @@ pub ComposedNextConditionals: Expr = {
 };
 
 pub ElseIf: Expr = {
-	ELSE IF <condition: SingleLineMultiTerm> THEN <else_if_body: Any> =>
+	ELSE IF <condition: SingleLineMultiTerm> THEN <else_if_body: MultiBody> =>
 		Expr::ElseIf{ condition: Box::new(condition), else_if_body: Box::new(else_if_body) }
 };
 
 pub ElseIfComposed: Expr = {
-	ELSE IF <condition: SingleLineMultiTerm> THEN <else_if_body: Any> =>
+	ELSE IF <condition: SingleLineMultiTerm> THEN <else_if_body: MultiBody> =>
 		Expr::ElseIfComposed{ condition: Box::new(condition), else_if_body: Box::new(else_if_body) }
 };
 
 pub Else: Expr = {
-	ELSE THEN <else_body:Any> => Expr::Else{else_body: Box::new(else_body)}
+	ELSE THEN <else_body: MultiBody> => Expr::Else{else_body: Box::new(else_body)}
 };
 
 pub Special: Special = {
@@ -181,9 +189,9 @@ match {
     ")"     => CLOSE_PAR,
     "state" => STATE,
     "interface" => INTERFACE,
-    "r"     => R,
-    "i"     => I,
-    "trigger"   => TRIGGER,
+    "requests"    => REQUESTS,
+    "indications" => INDICATIONS,
+    "trigger" => TRIGGER,
     "begin" => BEGIN,
     "end"   => END,
     "if"    => IF,
