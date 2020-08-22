@@ -85,7 +85,22 @@ pub enum Expr {
     ElseIfComposed {
         condition: Box<Expr>,
         else_if_body: Box<Expr>,
-    },
+	},
+	SetupTimer{
+		name: String,
+		args: Vec<String>,
+	},
+	SetupPeriodicTimer{
+		name: String,
+		args: Vec<String>,
+	},
+	CancelTimer{
+		name: String,
+	},
+	CancelTimerWithArgs{
+		name: String,
+		args: Vec<String>,
+	},
     String(String),
     Special(Special),
     State {
@@ -235,6 +250,25 @@ impl Translate for Expr {
 				name,
 				args.join(", "),
 				body.eval_translate()
+			),
+			Expr::SetupTimer{name, args} => format!(
+				SETUP_TIMER_CODE!(),
+				name,
+				args.join(", "),
+			),
+			Expr::SetupPeriodicTimer{name, args} => format!(
+				SETUP_PERIODIC_TIMER_CODE!(),
+				name,
+				args.join(", "),
+			),
+			Expr::CancelTimer{name} => format!(
+				CANCEL_TIMER_CODE!(),
+				name,
+			),
+			Expr::CancelTimerWithArgs{name, args} => format!(
+				CANCEL_TIMER_WITH_ARGS_CODE!(),
+				name,
+				args.join(", "),
 			),
             Expr::State { body } => format!(STATE_CODE!(), body.eval_translate()),
             Expr::Interface { reqs, indics } => format!(

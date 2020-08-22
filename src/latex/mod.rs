@@ -207,6 +207,22 @@ macro_rules! METHOD_CALL_WITH_ARGS_CODE {
     () => ("\\FuncSty{{{}(}}\\ArgSty{{{}}}\\FuncSty{{)}}");
 }
 
+macro_rules! SETUP_TIMER_CODE {
+    () => ("\\FuncSty{{Setup Timer {}(}}\\ArgSty{{{}}}\\FuncSty{{)}}");
+}
+
+macro_rules! CANCEL_TIMER_CODE {
+    () => ("\\FuncSty{{Cancel Timer {}}}\\ArgSty{{}}\\FuncSty{{}}");
+}
+
+macro_rules! CANCEL_TIMER_WITH_ARGS_CODE {
+    () => ("\\FuncSty{{Cancel Timer {}(}}\\ArgSty{{{}}}\\FuncSty{{)}}");
+}
+
+macro_rules! SETUP_PERIODIC_TIMER_CODE {
+    () => ("\\FuncSty{{Setup Periodic Timer {}(}}\\ArgSty{{{}}}\\FuncSty{{)}}");
+}
+
 macro_rules! PROCEDURE_CALL_CODE {
     () => ("\\FuncSty{{Call {}(}}\\ArgSty{{}}\\FuncSty{{)}}");
 }
