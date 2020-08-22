@@ -111,26 +111,36 @@ macro_rules! ELSE_IF_COMPOSED_CODE {
 }
 
 macro_rules! STATE_CODE {
-    () => ("\\SetKwIF{{State}}{{}}{{}}{{State}}{{:}}{{}}{{}}{{}}
-    \\State{{}}{{{}}}\n");
+	() => ("\\SetKwFunction{{FunctionID}}{{State}}
+	\\SetKwProg{{Fn}}{{}}{{:}}{{}}
+	\\Fn{{\\FunctionID}}{{
+		{}
+	}}");
 }
 
 macro_rules! REQUESTS_CODE {
-    () => ("\\SetKwIF{{Requests}}{{}}{{}}{{Requests}}{{:}}{{}}{{}}{{}}
-    \\Requests{{}}{{{}}}\n");
+    () => ("\\SetKwFunction{{FunctionID}}{{Requests}}
+	\\SetKwProg{{Fn}}{{}}{{:}}{{}}
+	\\Fn{{\\FunctionID}}{{
+		{}
+	}}");
 }
 
 macro_rules! INDICATIONS_CODE {
-    () => ("\\SetKwIF{{Indications}}{{}}{{}}{{Indications}}{{:}}{{}}{{}}{{}}
-    \\Indications{{}}{{{}}}\n");
+	() => ("\\SetKwFunction{{FunctionID}}{{Indications}}
+	\\SetKwProg{{Fn}}{{}}{{:}}{{}}
+	\\Fn{{\\FunctionID}}{{
+		{}
+	}}");
 }
 
 macro_rules! INTERFACE_CODE {
-    () => ("\\SetKwIF{{Interface}}{{}}{{}}{{Interface}}{{:}}{{}}{{}}{{}}
-    \\Interface{{}}{{\
-    {}\\;\n\
-    {}\n\
-    }}\n");
+    () => ("\\SetKwFunction{{FunctionID}}{{Indications}}
+	\\SetKwProg{{Fn}}{{}}{{:}}{{}}
+	\\Fn{{\\FunctionID}}{{
+		{}\\;\n\
+    	{}\n
+	}}");
 }
 
 macro_rules! METHOD_CALL_CODE {
