@@ -1,0 +1,10 @@
+upon teste(arg1, arg2) do:
+	ola = falso
+	teste = falso
+
+upon teste2(a, b) do:
+	trigger teste1(a, b)
+	trigger Send(a, b, b)
+
+upon Receive( messageType, s, arg1, arg2) do:
+	ola = falso
