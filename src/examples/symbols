@@ -1,6 +1,8 @@
-state
+state:
     in !in exists !exists unite intersect undefined
-end
-begin
-	a = false
-end
+upon teste(arg1, arg2) do:
+	ola = falso
+	teste = falso
+	if a in set then
+		ola = true
+	end

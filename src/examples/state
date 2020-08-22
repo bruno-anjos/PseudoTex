@@ -1,7 +1,10 @@
-state
+state:
 	var1
 	var2
-end
-begin
-	var1 = teste
-end
+
+upon teste(arg1, arg2) do:
+	ola = falso
+	teste = falso
+	if a in set then
+		ola = true
+	end

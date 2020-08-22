@@ -1,4 +1,3 @@
-begin
 upon teste(arg1, arg2) do:
 	ola = falso
 	teste = falso
@@ -23,5 +22,3 @@ upon teste(arg1, arg2) do:
 			ola = true
 		end
 	end
-end
-end

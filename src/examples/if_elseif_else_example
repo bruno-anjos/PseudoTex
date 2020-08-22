@@ -1,13 +1,10 @@
-begin
 upon teste(arg1, arg2) do:
 	ola = falso
 	teste = falso
 	if a in set then
 		ola = true
-	else if a not in set then
+	elif a not in set then
 		ola = false
-	else then
+	else
 		ola = nada
 	end
-end
-end
