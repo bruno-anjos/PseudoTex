@@ -1,18 +1,19 @@
 #[derive(Debug, PartialEq, Clone)]
 pub enum Expr {
     MultipleExpr { e1: Box<Expr>, e2: Box<Expr> },
+    MultipleExprNoNewLine { e1: Box<Expr>, e2: Box<Expr> },
     SingleLineMultipleTerm { t1: Box<Expr>, t2: Box<Expr> },
     MultiLineMultipleTerm { t1: Box<Expr>, t2: Box<Expr> },
     Assign { name: String, value: Box<Expr> },
     Method { name: String, body: Box<Expr> },
     MethodWithArgs { name: String, args: Vec<String>, body: Box<Expr> },
     Event { name: String, body: Box<Expr> },
-    EventWithArgs { name: String, args: Vec<String>, body: Box<Expr> },
+	EventWithArgs { name: String, args: Vec<String>, body: Box<Expr> },
 	If { condition: Box<Expr>, body: Box<Expr> },
 	ElseIf { condition: Box<Expr>, else_if_body: Box<Expr> },
 	Else { else_body: Box<Expr>},
-	IfComposed { condition: Box<Expr>, if_body: Box<Expr>, next_conditional: Box<Expr> },
-	ElseIfComposed {condition: Box<Expr>, else_if_body: Box<Expr>, next_conditional: Box<Expr>},
+	IfComposed { condition: Box<Expr>, if_body: Box<Expr> },
+	ElseIfComposed {condition: Box<Expr>, else_if_body: Box<Expr> },
     String(String),
     Special(Special),
     State { body: Box<Expr> },
@@ -48,6 +49,12 @@ impl Translate for Expr {
             Expr::MultipleExpr { e1, e2 } =>
                 format!(
                     "{}\n\\;{}\n",
+                    e1.eval_translate(),
+                    e2.eval_translate()
+				),
+			Expr::MultipleExprNoNewLine { e1, e2 } =>
+                format!(
+                    "{}\n{}\n",
                     e1.eval_translate(),
                     e2.eval_translate()
                 ),
@@ -105,22 +112,26 @@ impl Translate for Expr {
                 ),
             Expr::ElseIf { condition, else_if_body} =>
                 format!(
-                    IF_ELSE_CODE!(),
-                    condition.eval_translate(),
-                    if_body.eval_translate(),
-                    else_body.eval_translate()
+					ELSE_IF_CODE!(),
+					condition.eval_translate(),
+					else_if_body.eval_translate()
 				),
 			Expr::Else { else_body} =>
 			format!(
-				// TODO
+				ELSE_CODE!(),
+				else_body.eval_translate()
 			),
-			Expr::IfComposed { condition, if_body, next_conditional } =>
+			Expr::IfComposed { condition, if_body } =>
 			format!(
-				// TODO
+				IF_COMPOSED_CODE!(),
+				condition.eval_translate(),
+				if_body.eval_translate()
 			),
-			Expr::ElseIfComposed {condition, else_if_body, next_conditional} =>
+			Expr::ElseIfComposed {condition, else_if_body} =>
 			format!(
-				// TODO
+				ELSE_IF_COMPOSED_CODE!(),
+				condition.eval_translate(),
+				else_if_body.eval_translate()
 			),
             Expr::State { body } =>
                 format!(

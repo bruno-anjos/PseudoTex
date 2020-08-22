@@ -94,8 +94,20 @@ macro_rules! IF_CODE {
     () => ("\\If{{{}}}{{{}}}");
 }
 
-macro_rules! IF_ELSE_CODE {
-    () => ("\\eIf{{{}}}{{{}}}{{{}}}");
+macro_rules! ELSE_IF_CODE {
+    () => ("\\ElseIf{{{}}}{{{}}}");
+}
+
+macro_rules! ELSE_CODE {
+    () => ("\\Else{{{}}}");
+}
+
+macro_rules! IF_COMPOSED_CODE {
+    () => ("\\uIf{{{}}}{{{}}}");
+}
+
+macro_rules! ELSE_IF_COMPOSED_CODE {
+    () => ("\\uElseIf{{{}}}{{{}}}");
 }
 
 macro_rules! STATE_CODE {
