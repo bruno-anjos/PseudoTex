@@ -139,17 +139,17 @@ pub ComposedNextConditionals: Expr = {
 };
 
 pub ElseIf: Expr = {
-	ELSE IF <condition: SingleLineMultiTerm> THEN <else_if_body: MultiBody> =>
+	ELIF <condition: SingleLineMultiTerm> THEN <else_if_body: MultiBody> =>
 		Expr::ElseIf{ condition: Box::new(condition), else_if_body: Box::new(else_if_body) }
 };
 
 pub ElseIfComposed: Expr = {
-	ELSE IF <condition: SingleLineMultiTerm> THEN <else_if_body: MultiBody> =>
+	ELIF <condition: SingleLineMultiTerm> THEN <else_if_body: MultiBody> =>
 		Expr::ElseIfComposed{ condition: Box::new(condition), else_if_body: Box::new(else_if_body) }
 };
 
 pub Else: Expr = {
-	ELSE THEN <else_body: MultiBody> => Expr::Else{else_body: Box::new(else_body)}
+	ELSE <else_body: MultiBody> => Expr::Else{else_body: Box::new(else_body)}
 };
 
 pub Special: Special = {
@@ -196,6 +196,7 @@ match {
     "end"   => END,
     "if"    => IF,
     "else"  => ELSE,
+    "elif"  => ELIF,
     "then"  => THEN,
     "in"    => IN,
     "exists"=> EXISTS,
