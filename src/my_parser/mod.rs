@@ -123,14 +123,14 @@ pub enum Expr {
 	},
 	MethodCallWithArgs {
         name: String,
-        args: Vec<String>,
+        args: Box<Expr>,
 	},
 	ProcedureCall {
         name: String,
 	},
 	ProcedureCallWithArgs {
         name: String,
-        args: Vec<String>,
+        args: Box<Expr>,
     },
     Requests {
         requests: Box<Expr>,
@@ -140,6 +140,15 @@ pub enum Expr {
     },
     Trigger {
         method: Box<Expr>,
+    },
+    Return{
+
+    },
+    Continue{
+
+    },
+    Break{
+
     },
     Empty,
 }
@@ -158,6 +167,11 @@ pub enum Special {
 	CloseBra,
 	OpenCurlyBra,
 	CloseCurlyBra,
+	Dot,
+	CompEq,
+	Comma,
+	And,
+	Plus,
 }
 
 pub trait Translate {
@@ -198,9 +212,9 @@ impl Translate for Expr {
                 body.eval_translate()
             ),
 			Expr::MethodCall { name} => format!(METHOD_CALL_CODE!(), name),
-			Expr::MethodCallWithArgs { name, args } => format!(METHOD_CALL_WITH_ARGS_CODE!(), name, args.join(", ")),
+			Expr::MethodCallWithArgs { name, args } => format!(METHOD_CALL_WITH_ARGS_CODE!(), name, args.eval_translate()),
 			Expr::ProcedureCall { name } => format!(PROCEDURE_CALL_CODE!(), name),
-			Expr::ProcedureCallWithArgs { name, args } => format!(PROCEDURE_CALL_WITH_ARGS_CODE!(), name, args.join(", ")),
+			Expr::ProcedureCallWithArgs { name, args } => format!(PROCEDURE_CALL_WITH_ARGS_CODE!(), name, args.eval_translate()),
             Expr::String(s) => s,
             Expr::Special(s) => s.eval_translate(),
             Expr::If { condition, body } => format!(
@@ -301,6 +315,9 @@ impl Translate for Expr {
                 format!(INDICATIONS_CODE!(), indications.eval_translate())
             }
             Expr::Trigger { method } => format!(TRIGGER_CODE!(), method.eval_translate()),
+            Expr::Return{} => format!(RETURN_CODE!()),
+            Expr::Continue{} => format!(CONTINUE_CODE!()),
+            Expr::Break{} => format!(BREAK_CODE!()),
             Expr::Empty => String::new(),
         }
     }
@@ -321,6 +338,11 @@ impl Translate for Special {
             Special::CloseBra => CLOSE_BRA_CODE!(),
             Special::OpenCurlyBra => OPEN_CURLY_BRA_CODE!(),
             Special::CloseCurlyBra => CLOSE_CURLY_BRA_CODE!(),
+            Special::Dot => DOT_CODE!(),
+            Special::CompEq=> COMP_EQ_CODE!(),
+            Special::And => AND_CODE!(),
+            Special::Comma => COMMA_CODE!(),
+            Special::Plus => PLUS_CODE!(),
         }
         .to_string()
     }

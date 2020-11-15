@@ -254,3 +254,35 @@ macro_rules! OPEN_CURLY_BRA_CODE {
 macro_rules! CLOSE_CURLY_BRA_CODE {
 	() => ("\\}");
 }
+
+macro_rules! DOT_CODE {
+	() => (".");
+}
+
+macro_rules! COMP_EQ_CODE {
+	() => ("==");
+}
+
+macro_rules! RETURN_CODE {
+	() => ("return");
+}
+
+macro_rules! CONTINUE_CODE {
+	() => ("continue");
+}
+
+macro_rules! BREAK_CODE {
+	() => ("break");
+}
+
+macro_rules! AND_CODE {
+	() => ("&&");
+}
+
+macro_rules! COMMA_CODE {
+	() => (",");
+}
+
+macro_rules! PLUS_CODE {
+	() => ("+");
+}

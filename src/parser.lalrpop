@@ -3,49 +3,49 @@ use crate::my_parser::{Expr, Special};
 grammar;
 
 pub Main: Expr = {
-    <s: State> <b: MainBody> => Expr::MultipleExpr{ e1: Box::new(s), e2: Box::new(b) },
-    <i: Interface> <b: MainBody> => Expr::MultipleExpr{ e1: Box::new(i), e2: Box::new(b) },
-    <i: Interface> <s: State> <b: MainBody> =>
-        Expr::MultipleExpr{
-            e1: Box::new(
-                Expr::MultipleExpr{
-                    e1: Box::new(i),
-                    e2: Box::new(s)
-                }
-            ),
-            e2: Box::new(b)
-        },
-    <b: MainBody> => b,
+	<s: State> <b: MainBody> => Expr::MultipleExpr{ e1: Box::new(s), e2: Box::new(b) },
+	<i: Interface> <b: MainBody> => Expr::MultipleExpr{ e1: Box::new(i), e2: Box::new(b) },
+	<i: Interface> <s: State> <b: MainBody> =>
+		Expr::MultipleExpr{
+			e1: Box::new(
+				Expr::MultipleExpr{
+					e1: Box::new(i),
+					e2: Box::new(s)
+				}
+			),
+			e2: Box::new(b)
+		},
+	<b: MainBody> => b,
 };
 
 pub Interface: Expr = {
-    INTERFACE COLON <r: Requests> <i: Indications> => Expr::Interface{ reqs: Box::new(r), indics: Box::new(i) },
-    INTERFACE COLON <r: Requests> => Expr::Interface{ reqs: Box::new(r), indics: Box::new(Expr::Empty) },
-    INTERFACE COLON <i: Indications> => Expr::Interface{ reqs: Box::new(Expr::Empty), indics: Box::new(i) },
+	INTERFACE COLON <r: Requests> <i: Indications> => Expr::Interface{ reqs: Box::new(r), indics: Box::new(i) },
+	INTERFACE COLON <r: Requests> => Expr::Interface{ reqs: Box::new(r), indics: Box::new(Expr::Empty) },
+	INTERFACE COLON <i: Indications> => Expr::Interface{ reqs: Box::new(Expr::Empty), indics: Box::new(i) },
 };
 
 pub Requests: Expr = {
-    REQUESTS COLON <r: MultiCall> => Expr::Requests{ requests: Box::new(r) }
+	REQUESTS COLON <r: MultiCall> => Expr::Requests{ requests: Box::new(r) }
 };
 
 pub Indications: Expr = {
-    INDICATIONS COLON <i: MultiCall> => Expr::Indications{ indications: Box::new(i) }
+	INDICATIONS COLON <i: MultiCall> => Expr::Indications{ indications: Box::new(i) }
 };
 
 pub MultiCall: Expr = {
-    <m: MethodCall> => m,
-    <m: MethodCall> <ms: MultiCall> => Expr::MultipleExpr{ e1: Box::new(m), e2: Box::new(ms) },
+	<m: MethodCall> => m,
+	<m: MethodCall> <ms: MultiCall> => Expr::MultipleExpr{ e1: Box::new(m), e2: Box::new(ms) },
 };
 
 pub MethodCall: Expr = {
-    <s: STRING> OPEN_PAR CLOSE_PAR => Expr::MethodCall{ name: s.to_string() },
-    <s: STRING> OPEN_PAR <args: Args> CLOSE_PAR => Expr::MethodCallWithArgs{ name: s.to_string(), args: args },
+	<s: STRING> OPEN_PAR CLOSE_PAR => Expr::MethodCall{ name: s.to_string() },
+	<s: STRING> OPEN_PAR <args: SingleLineMultiTerm> CLOSE_PAR => Expr::MethodCallWithArgs{ name: s.to_string(), args: Box::new(args) },
 	CALL <s: STRING> OPEN_PAR CLOSE_PAR => Expr::ProcedureCall{ name: s.to_string() },
-	CALL <s: STRING> OPEN_PAR <args: Args> CLOSE_PAR => Expr::ProcedureCallWithArgs{ name: s.to_string(), args: args }
+	CALL <s: STRING> OPEN_PAR <args: SingleLineMultiTerm> CLOSE_PAR => Expr::ProcedureCallWithArgs{ name: s.to_string(), args: Box::new(args) }
 };
 
 pub State: Expr = {
-    STATE COLON <e: MultiLineMultiTerm> => Expr::State{ body: Box::new(e) }
+	STATE COLON <e: MultiLineMultiTerm> => Expr::State{ body: Box::new(e) }
 };
 
 pub MainBody: Expr = {
@@ -57,14 +57,14 @@ pub MainBody: Expr = {
 pub Init: Expr = {
 	UPON INIT DO COLON <body: MultiBody> => Expr::Init{ body: Box::new(body)},
 	UPON INIT OPEN_PAR <args: Args> CLOSE_PAR DO COLON <e: MultiBody> =>
-        Expr::InitWithArgs{ args: args, body: Box::new(e) }
+		Expr::InitWithArgs{ args: args, body: Box::new(e) }
 };
 
 pub Timer: Expr = {
 	UPON TIMER <id: STRING> DO COLON <e: MultiBody> =>
 		Expr::Timer{ name: id.to_string(), body: Box::new(e) },
 	UPON TIMER <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR DO COLON <e: MultiBody> =>
-        Expr::TimerWithArgs{ name: id.to_string(), args: args, body: Box::new(e) }
+		Expr::TimerWithArgs{ name: id.to_string(), args: args, body: Box::new(e) }
 };
 
 pub CrashWithArgs: Expr = {
@@ -73,8 +73,8 @@ pub CrashWithArgs: Expr = {
 };
 
 pub TopLevel: Expr = {
-    <b: BasicExpr> => b,
-    <b: BasicExpr> <e: TopLevel> => Expr::MultipleExpr{ e1: Box::new(b), e2: Box::new(e) }
+	<b: BasicExpr> => b,
+	<b: BasicExpr> <e: TopLevel> => Expr::MultipleExpr{ e1: Box::new(b), e2: Box::new(e) }
 };
 
 pub Procedure: Expr = {
@@ -111,7 +111,7 @@ pub MultiBody: Expr = {
 };
 
 pub ForEach: Expr = {
-	FOREACH <condition: SingleLineMultiTerm> DO COLON <body: MultiBody> END =>
+	FOREACH <condition: SingleLineMultiTerm> COLON <body: MultiBody> END =>
 		Expr::ForEach{ condition: Box::new(condition), body: Box::new(body) }
 };
 
@@ -127,45 +127,52 @@ pub BodyLine: Expr = {
 	<e: MethodCall> SEMI_COLON => e,
 	<e: SetupTimer> SEMI_COLON => e,
 	<e: CancelTimer> SEMI_COLON => e,
-}
+	<e: Control> SEMI_COLON => e,
+};
+
+pub Control: Expr = {
+	RETURN => Expr::Return{},
+	BREAK => Expr::Break{},
+	CONTINUE => Expr::Continue{},	
+};
 
 pub Method: Expr = {
-    SimpleMethod,
-    ComplexMethod,
-    SimpleEvent,
-    ComplexEvent
+	SimpleMethod,
+	ComplexMethod,
+	SimpleEvent,
+	ComplexEvent
 };
 
 pub Trigger: Expr = {
-    TRIGGER <m: MethodCall> => Expr::Trigger{ method: Box::new(m) },
+	TRIGGER <m: MethodCall> => Expr::Trigger{ method: Box::new(m) },
 }
 
 pub SimpleMethod: Expr = {
-    UPON <id: STRING> DO COLON <e: MultiBody> => Expr::Method{ name: id.to_string(), body: Box::new(e) }
+	UPON <id: STRING> DO COLON <e: MultiBody> => Expr::Method{ name: id.to_string(), body: Box::new(e) }
 };
 
 pub ComplexMethod: Expr = {
-    UPON <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR DO COLON <e: MultiBody> =>
-        Expr::MethodWithArgs{ name: id.to_string(), args: args, body: Box::new(e) }
+	UPON <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR DO COLON <e: MultiBody> =>
+		Expr::MethodWithArgs{ name: id.to_string(), args: args, body: Box::new(e) }
 };
 
 pub SimpleEvent: Expr = {
-    UPON EVENT <id: STRING> DO COLON <e: MultiBody> => Expr::Event{ name: id.to_string(), body: Box::new(e) }
+	UPON EVENT <id: STRING> DO COLON <e: MultiBody> => Expr::Event{ name: id.to_string(), body: Box::new(e) }
 };
 
 pub ComplexEvent: Expr = {
-    UPON EVENT <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR DO COLON <e: MultiBody> =>
-        Expr::EventWithArgs{ name: id.to_string(), args: args, body: Box::new(e) }
+	UPON EVENT <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR DO COLON <e: MultiBody> =>
+		Expr::EventWithArgs{ name: id.to_string(), args: args, body: Box::new(e) }
 };
 
 pub Args: Vec<String> = {
-    <a: STRING> => vec![a.to_string()],
-    <a: STRING> COMMA <mut args: Args> => { let mut res = vec![a.to_string()]; res.append(&mut args); res }
+	<a: STRING> => vec![a.to_string()],
+	<a: STRING> COMMA <mut args: Args> => { let mut res = vec![a.to_string()]; res.append(&mut args); res }
 };
 
 pub Assign: Expr = {
-    <id: SingleLineMultiTermNoSpace> EQ <value: SingleLineMultiTermNoSpace> => Expr::Assign{ name: Box::new(id), value: Box::new(value) },
-    <id: SingleLineMultiTermNoSpace> EQ <value: MethodCall> => Expr::Assign{ name: Box::new(id), value: Box::new(value) }
+	<id: SingleLineMultiTermNoSpace> EQ <value: SingleLineMultiTermNoSpace> => Expr::Assign{ name: Box::new(id), value: Box::new(value) },
+	<id: SingleLineMultiTermNoSpace> EQ <value: MethodCall> => Expr::Assign{ name: Box::new(id), value: Box::new(value) }
 };
 
 pub Conditional: Expr = {
@@ -174,104 +181,126 @@ pub Conditional: Expr = {
 		Expr::MultipleExprNoNewLine{e1: Box::new(e), e2: Box::new(next_conditional)},
 };
 
+// If expression
 pub If: Expr = {
-	IF <condition: SingleLineMultiTerm> THEN <body: MultiBody> =>
+	IF <condition: SingleLineMultiTerm> COLON <body: MultiBody> =>
 		Expr::If{ condition: Box::new(condition), body: Box::new(body) },
 };
 
+// If expression followed by either an ElseIf or an Else
 pub IfComposed: Expr = {
-	IF <condition: SingleLineMultiTerm> THEN <body: MultiBody> =>
+	IF <condition: SingleLineMultiTerm> COLON <body: MultiBody> =>
 		Expr::IfComposed{ condition: Box::new(condition), if_body: Box::new(body) },
 };
 
+// Else if expression
+pub ElseIf: Expr = {
+	ELIF <condition: SingleLineMultiTerm> COLON <else_if_body: MultiBody> =>
+		Expr::ElseIf{ condition: Box::new(condition), else_if_body: Box::new(else_if_body) }
+};
+
+// Else if expression with else after
+pub ElseIfComposed: Expr = {
+	ELIF <condition: SingleLineMultiTerm> COLON <else_if_body: MultiBody> =>
+		Expr::ElseIfComposed{ condition: Box::new(condition), else_if_body: Box::new(else_if_body) }
+};
+
+// Else expression
+pub Else: Expr = {
+	ELSE COLON <else_body: MultiBody> => Expr::Else{else_body: Box::new(else_body)}
+};
+
+// After an If expression it can either be a single ElseIf or Else (SimpleNextConditional)
+// or an ElseIf composed (followed by other ElseIfs or Else)
 pub NextConditional: Expr = {
 	<e: SimpleNextConditional> => e,
 	<e: ComposedNextConditionals> => e,
 };
 
+// Check NextConditional comment
 pub SimpleNextConditional: Expr = {
 	<e: ElseIf> => e,
 	<e: Else> => e
 };
 
+// Check NextConditional comment
 pub ComposedNextConditionals: Expr = {
-	<elseIf: ElseIfComposed> <next_conditional: NextConditional> => Expr::MultipleExprNoNewLine{e1: Box::new(elseIf), e2: Box::new(next_conditional)}
+	<else_if: ElseIfComposed> <next_conditional: NextConditional> => Expr::MultipleExprNoNewLine{e1: Box::new(else_if), e2: Box::new(next_conditional)}
 };
 
-pub ElseIf: Expr = {
-	ELIF <condition: SingleLineMultiTerm> THEN <else_if_body: MultiBody> =>
-		Expr::ElseIf{ condition: Box::new(condition), else_if_body: Box::new(else_if_body) }
+// Multiple terminal tokens in more than one line
+pub MultiLineMultiTerm: Expr = {
+	<e: Term> => e,
+	<e1: Term> <e2: MultiLineMultiTerm> => Expr::MultiLineMultipleTerm { t1: Box::new(e1), t2: Box::new(e2) }
 };
 
-pub ElseIfComposed: Expr = {
-	ELIF <condition: SingleLineMultiTerm> THEN <else_if_body: MultiBody> =>
-		Expr::ElseIfComposed{ condition: Box::new(condition), else_if_body: Box::new(else_if_body) }
+// Multiple terminal tokens in the same line with a speace between them
+pub SingleLineMultiTerm: Expr = {
+	<e: Term> => e,
+	<e1: Term> <e2: SingleLineMultiTerm> => Expr::SingleLineMultipleTerm { t1: Box::new(e1), t2: Box::new(e2) }
 };
 
-pub Else: Expr = {
-	ELSE <else_body: MultiBody> => Expr::Else{else_body: Box::new(else_body)}
+// Multiple terminal tokens in the same line without space between them
+pub SingleLineMultiTermNoSpace: Expr = {
+	<e: Term> => e,
+	<e1: Term> <e2: SingleLineMultiTermNoSpace> => Expr::SingleLineMultipleTermNoSpace { t1: Box::new(e1), t2: Box::new(e2) }
 };
 
+// Basic terminal token, can be either a string or a special
+pub Term: Expr = {
+	<s: STRING> => Expr::String(s.to_string()),
+	<s: Special> => Expr::Special(s),
+};
+
+// Special characters
 pub Special: Special = {
-    IN => Special::In,
-    EXISTS => Special::Exists,
-    NOT_EXISTS => Special::NotExists,
-    NOT_IN => Special::NotIn,
-    SET_MINUS => Special::SetMinus,
-    UNION => Special::Union,
-    INTERSECT => Special::Intersect,
+	COMP_EQ => Special::CompEq,
+	IN => Special::In,
+	EXISTS => Special::Exists,
+	NOT_EXISTS => Special::NotExists,
+	NOT_IN => Special::NotIn,
+	SET_MINUS => Special::SetMinus,
+	UNION => Special::Union,
+	INTERSECT => Special::Intersect,
 	UNDEFINED => Special::Undefined,
 	OPEN_BRA => Special::OpenBra,
 	CLOSE_BRA => Special::CloseBra,
 	OPEN_CURLY_BRA => Special::OpenCurlyBra,
 	CLOSE_CURLY_BRA => Special::CloseCurlyBra,
-};
-
-pub MultiLineMultiTerm: Expr = {
-    <e: Term> => e,
-    <e1: Term> <e2: MultiLineMultiTerm> => Expr::MultiLineMultipleTerm { t1: Box::new(e1), t2: Box::new(e2) }
-};
-
-pub SingleLineMultiTerm: Expr = {
-    <e: Term> => e,
-    <e1: Term> <e2: SingleLineMultiTerm> => Expr::SingleLineMultipleTerm { t1: Box::new(e1), t2: Box::new(e2) }
-};
-
-pub SingleLineMultiTermNoSpace: Expr = {
-    <e: Term> => e,
-    <e1: Term> <e2: SingleLineMultiTermNoSpace> => Expr::SingleLineMultipleTermNoSpace { t1: Box::new(e1), t2: Box::new(e2) }
-};
-
-pub Term: Expr = {
-    <s: STRING> => Expr::String(s.to_string()),
-    <s: Special> => Expr::Special(s),
+	AND => Special::And,
+	DOT => Special::Dot,
+	COMMA => Special::Comma,
+	PLUS => Special::Plus,
 };
 
 match {
-    "="     => EQ,
-    "upon"  => UPON,
-    "event" => EVENT,
-    "do"    => DO,
-    ":"     => COLON,
-    ","     => COMMA,
-    "("     => OPEN_PAR,
-    ")"     => CLOSE_PAR,
-    "["     => OPEN_BRA,
-    "]"     => CLOSE_BRA,
-    "{"     => OPEN_CURLY_BRA,
-    "}"     => CLOSE_CURLY_BRA,
-    "state" => STATE,
-    "interface" => INTERFACE,
-    "requests"    => REQUESTS,
-    "indications" => INDICATIONS,
-    "trigger" => TRIGGER,
-    "begin" => BEGIN,
-    "end"   => END,
-    "if"    => IF,
-    "else"  => ELSE,
-    "elif"  => ELIF,
-    "then"  => THEN,
-    "in"    => IN,
+	"="     => EQ,
+	"=="     => COMP_EQ,
+	"and" => AND,
+	"upon"  => UPON,
+	"event" => EVENT,
+	"do"    => DO,
+	":"     => COLON,
+	","     => COMMA,
+	"("     => OPEN_PAR,
+	")"     => CLOSE_PAR,
+	"["     => OPEN_BRA,
+	"]"     => CLOSE_BRA,
+	"{"     => OPEN_CURLY_BRA,
+	"}"     => CLOSE_CURLY_BRA,
+	"+" => PLUS,
+	"state" => STATE,
+	"interface" => INTERFACE,
+	"requests"    => REQUESTS,
+	"indications" => INDICATIONS,
+	"trigger" => TRIGGER,
+	"begin" => BEGIN,
+	"end"   => END,
+	"if"    => IF,
+	"else"  => ELSE,
+	"elif"  => ELIF,
+	"then"  => THEN,
+	"in"    => IN,
 	"exists"=> EXISTS,
 	"init" => INIT,
 	"timer" => TIMER,
@@ -281,13 +310,17 @@ match {
 	"setup" => SETUP,
 	"periodic" => PERIODIC,
 	"cancel" => CANCEL,
-	"for each" => FOREACH,
-    "\\"     => SET_MINUS,
+	"foreach" => FOREACH,
+	"\\"     => SET_MINUS,
 	"!in"   => NOT_IN,
 	";" => SEMI_COLON,
-    "!exists"   => NOT_EXISTS,
+	"!exists"   => NOT_EXISTS,
 	"unite" => UNION,
-    "intersect" => INTERSECT,
+	"intersect" => INTERSECT,
 	"undefined" => UNDEFINED,
-    r"\w+"  => STRING
+	"." => DOT,
+	"continue" => CONTINUE,
+	"return" => RETURN,
+	"break" => BREAK,
+	r"\w+"  => STRING
 }
