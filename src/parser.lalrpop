@@ -188,6 +188,7 @@ pub DefiningArgs: Vec<String> = {
 
 pub CallingArgs: Expr = {
 	Expression,
+	<e1: Expression> COMMA <e2: CallingArgs> => Expr::CallingArgs{e1: Box::new(e1), e2: Box::new(e2)}
 };
 
 pub Assign: Expr = {
@@ -300,12 +301,16 @@ pub Operation: Expr = {
 };
 
 pub VecAccess: Expr = {
-	<s: STRING> OPEN_BRA <e: Expression> CLOSE_BRA => Expr::Access{s, e},
+	<e1: StructAccess> OPEN_BRA <e2: Expression> CLOSE_BRA => Expr::Access{l: Box::new(e1), r: Box::new(e2)},
+    <e1: Id> OPEN_BRA <e2: Expression> CLOSE_BRA => Expr::Access{l: Box::new(Expr::String(e1.to_string())),
+     r: Box::new(e2)},
+    <e1: MethodCall> OPEN_BRA <e2: Expression> CLOSE_BRA => Expr::Access{l: Box::new(e1), r: Box::new(e2)},
 };
 
 pub Set: Expr = {
-	OPEN_CURLY_BRA <e: Expression> CLOSE_CURLY_BRA => Expr::Set{},
-}
+	OPEN_CURLY_BRA <e: Expression> CLOSE_CURLY_BRA => Expr::Set{e: Box::new(e)},
+	OPEN_CURLY_BRA CLOSE_CURLY_BRA => Expr::EmptySet{},
+};
 
 pub StructAccess: Expr = {
 	<s1: STRING> DOT <s2: STRING> => Expr::SingleLineMultipleTermNoSpace{

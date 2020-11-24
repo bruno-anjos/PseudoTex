@@ -294,3 +294,19 @@ macro_rules! plus_code {
 macro_rules! minus_code {
 	() => ("-");
 }
+
+macro_rules! operation_code {
+    () => ("{} {} {}");
+}
+
+macro_rules! access_code {
+    () => ("{}[{}]");
+}
+
+macro_rules! set_code {
+    () => ("\\{{{}\\}}");
+}
+
+macro_rules! empty_set_code {
+    () => ("\\{{\\}}");
+}
