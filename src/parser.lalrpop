@@ -18,6 +18,15 @@ pub Main: Expr = {
 	<b: MainBody> => b,
 };
 
+pub State: Expr = {
+	STATE COLON <ids: MultipleIds> => Expr::State{ body: Box::new(ids) }
+};
+
+pub MultipleIds: Expr = {
+	<id: Id> => Expr::String(id.to_string()),
+	<id1: Id> <m: MultipleIds> => Expr::MultipleExpr{e1: Box::new(Expr::String(id1.to_string())), e2: Box::new(m)}
+}
+
 pub Interface: Expr = {
 	INTERFACE COLON <r: Requests> <i: Indications> => Expr::Interface{ reqs: Box::new(r), indics: Box::new(i) },
 	INTERFACE COLON <r: Requests> => Expr::Interface{ reqs: Box::new(r), indics: Box::new(Expr::Empty) },
@@ -25,94 +34,113 @@ pub Interface: Expr = {
 };
 
 pub Requests: Expr = {
-	REQUESTS COLON <r: MultiCall> => Expr::Requests{ requests: Box::new(r) }
+	REQUESTS COLON <r: MultiMethodCall> => Expr::Requests{ requests: Box::new(r) }
 };
 
 pub Indications: Expr = {
-	INDICATIONS COLON <i: MultiCall> => Expr::Indications{ indications: Box::new(i) }
+	INDICATIONS COLON <i: MultiMethodCall> => Expr::Indications{ indications: Box::new(i) }
 };
 
-pub MultiCall: Expr = {
-	<m: MethodCall> => m,
-	<m: MethodCall> <ms: MultiCall> => Expr::MultipleExpr{ e1: Box::new(m), e2: Box::new(ms) },
-};
-
-pub MethodCall: Expr = {
-	<s: STRING> OPEN_PAR CLOSE_PAR => Expr::MethodCall{ name: s.to_string() },
-	<s: STRING> OPEN_PAR <args: SingleLineMultiTerm> CLOSE_PAR => Expr::MethodCallWithArgs{ name: s.to_string(), args: Box::new(args) },
-	CALL <s: STRING> OPEN_PAR CLOSE_PAR => Expr::ProcedureCall{ name: s.to_string() },
-	CALL <s: STRING> OPEN_PAR <args: SingleLineMultiTerm> CLOSE_PAR => Expr::ProcedureCallWithArgs{ name: s.to_string(), args: Box::new(args) }
-};
-
-pub State: Expr = {
-	STATE COLON <e: MultiLineMultiTerm> => Expr::State{ body: Box::new(e) }
-};
+pub ProcedureCall: Expr = {
+	CALL <s: Id> OPEN_PAR CLOSE_PAR => Expr::ProcedureCall{ name: s.to_string() },
+	CALL <s: Id> OPEN_PAR <args: CallingArgs> CLOSE_PAR => Expr::ProcedureCallWithArgs{ name: s.to_string(), args: Box::new
+	(args) }
+}
 
 pub MainBody: Expr = {
 	<e: Init> => e,
-	<e:TopLevel> => e,
+	<e: TopLevel> => e,
 	<e1: Init> <e2:TopLevel> => Expr::MultipleExpr{ e1: Box::new(e1), e2: Box::new(e2) }
 };
 
 pub Init: Expr = {
 	UPON INIT DO COLON <body: MultiBody> => Expr::Init{ body: Box::new(body)},
-	UPON INIT OPEN_PAR <args: Args> CLOSE_PAR DO COLON <e: MultiBody> =>
-		Expr::InitWithArgs{ args: args, body: Box::new(e) }
-};
-
-pub Timer: Expr = {
-	UPON TIMER <id: STRING> DO COLON <e: MultiBody> =>
-		Expr::Timer{ name: id.to_string(), body: Box::new(e) },
-	UPON TIMER <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR DO COLON <e: MultiBody> =>
-		Expr::TimerWithArgs{ name: id.to_string(), args: args, body: Box::new(e) }
-};
-
-pub CrashWithArgs: Expr = {
-	UPON CRASH OPEN_PAR <args: Args> CLOSE_PAR DO COLON <body: MultiBody> =>
-		Expr::CrashWithArgs{ args: args, body: Box::new(body)}
+	UPON INIT OPEN_PAR <args: DefiningArgs> CLOSE_PAR DO COLON <e: MultiBody> =>
+		Expr::InitWithArgs{ args, body: Box::new(e) }
 };
 
 pub TopLevel: Expr = {
-	<b: BasicExpr> => b,
-	<b: BasicExpr> <e: TopLevel> => Expr::MultipleExpr{ e1: Box::new(b), e2: Box::new(e) }
+	<b: BasicStatements> => b,
+	<b: BasicStatements> <e: TopLevel> => Expr::MultipleExpr{ e1: Box::new(b), e2: Box::new(e) }
 };
 
-pub Procedure: Expr = {
-	PROCEDURE <id: STRING> COLON <body: MultiBody> => 
-		Expr::Procedure{ name: id.to_string(), body: Box::new(body) },
-	PROCEDURE <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR COLON <body: MultiBody> => 
-		Expr::ProcedureWithArgs{ name: id.to_string(), args: args, body: Box::new(body) },
-};
-
-pub SetupTimer: Expr = {
-	SETUP TIMER <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR =>
-		Expr::SetupTimer{ name: id.to_string(), args: args },
-	SETUP PERIODIC TIMER <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR =>
-		Expr::SetupPeriodicTimer{ name: id.to_string(), args: args }
-};
-
-pub CancelTimer: Expr = {
-	CANCEL TIMER <id: STRING> =>
-		Expr::CancelTimer{ name: id.to_string() },
-	CANCEL PERIODIC TIMER <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR =>
-		Expr::CancelTimerWithArgs{ name: id.to_string(), args: args }
-};
-
-pub BasicExpr: Expr = {
+pub BasicStatements: Expr = {
 	<e: Method> => e,
 	<e: Timer> => e,
 	<e: CrashWithArgs> => e,
 	<e: Procedure> => e,
 };
 
+pub Method: Expr = {
+	SimpleMethod,
+	ComplexMethod,
+	SimpleEvent,
+	ComplexEvent
+};
+
+// METHODS
+pub SimpleMethod: Expr = {
+	UPON <id: Id> DO COLON <e: MultiBody> => Expr::Method{ name: id.to_string(), body: Box::new(e) }
+};
+
+pub ComplexMethod: Expr = {
+	UPON <id: Id> OPEN_PAR <args: DefiningArgs> CLOSE_PAR DO COLON <e: MultiBody> => Expr::MethodWithArgs{ name: id
+	.to_string(), args, body: Box::new(e) }
+};
+
+pub SimpleEvent: Expr = {
+	UPON EVENT <id: Id> DO COLON <e: MultiBody> => Expr::Event{ name: id.to_string(), body: Box::new(e) }
+};
+
+pub ComplexEvent: Expr = {
+	UPON EVENT <id: Id> OPEN_PAR <args: DefiningArgs> CLOSE_PAR DO COLON <e: MultiBody> =>
+		Expr::EventWithArgs{ name: id.to_string(), args, body: Box::new(e) }
+};
+
+pub Trigger: Expr = {
+	TRIGGER <m: MethodCall> => Expr::Trigger{ method: Box::new(m) },
+}
+
+// TIMERS
+pub Timer: Expr = {
+	UPON TIMER <id: Id> DO COLON <e: MultiBody> =>
+		Expr::Timer{ name: id.to_string(), body: Box::new(e) },
+	UPON TIMER <id: Id> OPEN_PAR <args: DefiningArgs> CLOSE_PAR DO COLON <e: MultiBody> =>
+		Expr::TimerWithArgs{ name: id.to_string(), args, body: Box::new(e) }
+};
+
+pub SetupTimer: Expr = {
+	SETUP TIMER <id: Id> OPEN_PAR <args: CallingArgs> CLOSE_PAR =>
+		Expr::SetupTimer{ name: id.to_string(), args: Box::new(args) },
+	SETUP PERIODIC TIMER <id: Id> OPEN_PAR <args: CallingArgs> CLOSE_PAR =>
+		Expr::SetupPeriodicTimer{ name: id.to_string(), args: Box::new(args) }
+};
+
+pub CancelTimer: Expr = {
+	CANCEL TIMER <id: Id> =>
+		Expr::CancelTimer{ name: id.to_string() },
+	CANCEL PERIODIC TIMER <id: Id> OPEN_PAR <args: CallingArgs> CLOSE_PAR =>
+		Expr::CancelTimerWithArgs{ name: id.to_string(), args: Box::new(args) }
+};
+
+// CRASHES
+pub CrashWithArgs: Expr = {
+	UPON CRASH OPEN_PAR <args: DefiningArgs> CLOSE_PAR DO COLON <body: MultiBody> =>
+		Expr::CrashWithArgs{ args, body: Box::new(body)}
+};
+
+// PROCEDURES
+pub Procedure: Expr = {
+	PROCEDURE <id: Id> COLON <body: MultiBody> => 
+		Expr::Procedure{ name: id.to_string(), body: Box::new(body) },
+	PROCEDURE <id: Id> OPEN_PAR <args: DefiningArgs> CLOSE_PAR COLON <body: MultiBody> =>
+		Expr::ProcedureWithArgs{ name: id.to_string(), args, body: Box::new(body) },
+};
+
+// BODY
 pub MultiBody: Expr = {
 	<e: Body> => e,
 	<e1: Body> <e2: MultiBody> => Expr::MultipleExpr{ e1: Box::new(e1), e2: Box::new(e2) }
-};
-
-pub ForEach: Expr = {
-	FOREACH <condition: SingleLineMultiTerm> COLON <body: MultiBody> END =>
-		Expr::ForEach{ condition: Box::new(condition), body: Box::new(body) }
 };
 
 pub Body: Expr = {
@@ -125,9 +153,26 @@ pub BodyLine: Expr = {
 	<e: Assign> SEMI_COLON => e,
 	<e: Trigger> SEMI_COLON => e,
 	<e: MethodCall> SEMI_COLON => e,
+	<e: ProcedureCall> SEMI_COLON => e,
 	<e: SetupTimer> SEMI_COLON => e,
 	<e: CancelTimer> SEMI_COLON => e,
 	<e: Control> SEMI_COLON => e,
+};
+
+pub MultiMethodCall: Expr = {
+	<m: MethodCall> => m,
+	<m: MethodCall> <ms: MultiMethodCall> => Expr::MultipleExpr{ e1: Box::new(m), e2: Box::new(ms) },
+};
+
+pub MethodCall: Expr = {
+	<s: Id> OPEN_PAR CLOSE_PAR => Expr::MethodCall{ name: s.to_string() },
+	<s: Id> OPEN_PAR <args: CallingArgs> CLOSE_PAR => Expr::MethodCallWithArgs{ name: s.to_string(), args: Box::new
+	(args) }
+};
+
+pub ForEach: Expr = {
+	FOREACH <condition: SingleLineMultiTerm> COLON <body: MultiBody> END =>
+		Expr::ForEach{ condition: Box::new(condition), body: Box::new(body) }
 };
 
 pub Control: Expr = {
@@ -136,45 +181,20 @@ pub Control: Expr = {
 	CONTINUE => Expr::Continue{},	
 };
 
-pub Method: Expr = {
-	SimpleMethod,
-	ComplexMethod,
-	SimpleEvent,
-	ComplexEvent
+pub DefiningArgs: Vec<String> = {
+	<a: Id> => vec![a.to_string()],
+	<a: Id> COMMA <mut args: DefiningArgs> => { let mut res = vec![a.to_string()]; res.append(&mut args); res }
 };
 
-pub Trigger: Expr = {
-	TRIGGER <m: MethodCall> => Expr::Trigger{ method: Box::new(m) },
-}
-
-pub SimpleMethod: Expr = {
-	UPON <id: STRING> DO COLON <e: MultiBody> => Expr::Method{ name: id.to_string(), body: Box::new(e) }
-};
-
-pub ComplexMethod: Expr = {
-	UPON <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR DO COLON <e: MultiBody> =>
-		Expr::MethodWithArgs{ name: id.to_string(), args: args, body: Box::new(e) }
-};
-
-pub SimpleEvent: Expr = {
-	UPON EVENT <id: STRING> DO COLON <e: MultiBody> => Expr::Event{ name: id.to_string(), body: Box::new(e) }
-};
-
-pub ComplexEvent: Expr = {
-	UPON EVENT <id: STRING> OPEN_PAR <args: Args> CLOSE_PAR DO COLON <e: MultiBody> =>
-		Expr::EventWithArgs{ name: id.to_string(), args: args, body: Box::new(e) }
-};
-
-pub Args: Vec<String> = {
-	<a: STRING> => vec![a.to_string()],
-	<a: STRING> COMMA <mut args: Args> => { let mut res = vec![a.to_string()]; res.append(&mut args); res }
+pub CallingArgs: Expr = {
+	Expression,
 };
 
 pub Assign: Expr = {
-	<id: SingleLineMultiTermNoSpace> EQ <value: SingleLineMultiTermNoSpace> => Expr::Assign{ name: Box::new(id), value: Box::new(value) },
-	<id: SingleLineMultiTermNoSpace> EQ <value: MethodCall> => Expr::Assign{ name: Box::new(id), value: Box::new(value) }
+	<a: Assignable> EQ <e: Expression> => Expr::Assign{ name: Box::new(a), value: Box::new(e) },
 };
 
+// CONDITIONALS
 pub Conditional: Expr = {
 	<e: If> END => e,
 	<e: IfComposed> <next_conditional: NextConditional> END =>
@@ -248,79 +268,132 @@ pub SingleLineMultiTermNoSpace: Expr = {
 
 // Basic terminal token, can be either a string or a special
 pub Term: Expr = {
-	<s: STRING> => Expr::String(s.to_string()),
-	<s: Special> => Expr::Special(s),
+	<e: Expression> => e
+};
+
+pub Assignable: Expr = {
+	<va: VecAccess> => va,
+	<sa: StructAccess> => sa,
+	<id: Id> => Expr::String(id.to_string()),
+}
+
+pub Expression: Expr = {
+	<o: Operation> => o,
+	<v: VecAccess> => v,
+	<s: Set> => s,
+	<sa: StructAccess> => sa,
+	<m: MethodCall> => m,
+	<id: Id> => Expr::String(id.to_string())
+};
+
+pub Operation: Expr = {
+	<e1: VecAccess> <op: OperatorWithSpace> <e2: Expression> => Expr::Operation{e1: Box::new(e1), op, e2: Box::new
+	(e2)},
+	<e1: Set> <op: OperatorWithSpace> <e2: Expression> => Expr::Operation{e1: Box::new(e1), op, e2: Box::new
+    	(e2)},
+    <e1: StructAccess> <op: OperatorWithSpace> <e2: Expression> => Expr::Operation{e1: Box::new(e1), op, e2: Box::new
+    	(e2)},
+    <e1: MethodCall> <op: OperatorWithSpace> <e2: Expression> => Expr::Operation{e1: Box::new(e1), op, e2: Box::new
+    	(e2)},
+    <e1: Id> <op: OperatorWithSpace> <e2: Expression> => Expr::Operation{e1: Box::new(Expr::String(e1.to_string())), op, e2:
+    	Box::new(e2)},
+};
+
+pub VecAccess: Expr = {
+	<s: STRING> OPEN_BRA <e: Expression> CLOSE_BRA => Expr::Access{s, e},
+};
+
+pub Set: Expr = {
+	OPEN_CURLY_BRA <e: Expression> CLOSE_CURLY_BRA => Expr::Set{},
+}
+
+pub StructAccess: Expr = {
+	<s1: STRING> DOT <s2: STRING> => Expr::SingleLineMultipleTermNoSpace{
+		t1: Box::new(Expr::String(format!("{}.", s1))),
+		t2: Box::new(Expr::String(s2.to_string()))
+	},
+};
+
+pub OperatorWithSpace: Special = {
+	PLUS => Special::Plus,
+	MINUS => Special::Minus,
+	IN => Special::In,
+	NOT_IN => Special::NotIn,
+	EXISTS => Special::Exists,
+	NOT_EXISTS => Special::NotExists,
+	SET_MINUS => Special::SetMinus,
+	UNION => Special::Union,
+	INTERSECT => Special::Intersect,
+	AND => Special::And,
+	COMP_EQ => Special::CompEq,
+}
+
+pub Id: String = {
+	<s: STRING> UNDERSCORE <id: Id> => format!("{}\\_{}", s, id),
+	<s: STRING> => s.to_string(),
 };
 
 // Special characters
 pub Special: Special = {
-	COMP_EQ => Special::CompEq,
-	IN => Special::In,
-	EXISTS => Special::Exists,
-	NOT_EXISTS => Special::NotExists,
-	NOT_IN => Special::NotIn,
-	SET_MINUS => Special::SetMinus,
-	UNION => Special::Union,
-	INTERSECT => Special::Intersect,
 	UNDEFINED => Special::Undefined,
 	OPEN_BRA => Special::OpenBra,
 	CLOSE_BRA => Special::CloseBra,
 	OPEN_CURLY_BRA => Special::OpenCurlyBra,
 	CLOSE_CURLY_BRA => Special::CloseCurlyBra,
-	AND => Special::And,
 	DOT => Special::Dot,
 	COMMA => Special::Comma,
-	PLUS => Special::Plus,
 };
 
 match {
-	"="     => EQ,
-	"=="     => COMP_EQ,
-	"and" => AND,
-	"upon"  => UPON,
-	"event" => EVENT,
-	"do"    => DO,
-	":"     => COLON,
-	","     => COMMA,
-	"("     => OPEN_PAR,
-	")"     => CLOSE_PAR,
-	"["     => OPEN_BRA,
-	"]"     => CLOSE_BRA,
-	"{"     => OPEN_CURLY_BRA,
-	"}"     => CLOSE_CURLY_BRA,
-	"+" => PLUS,
-	"state" => STATE,
-	"interface" => INTERFACE,
-	"requests"    => REQUESTS,
-	"indications" => INDICATIONS,
-	"trigger" => TRIGGER,
-	"begin" => BEGIN,
-	"end"   => END,
-	"if"    => IF,
-	"else"  => ELSE,
-	"elif"  => ELIF,
-	"then"  => THEN,
-	"in"    => IN,
-	"exists"=> EXISTS,
-	"init" => INIT,
-	"timer" => TIMER,
-	"crash" => CRASH,
-	"procedure" => PROCEDURE,
-	"call" => CALL,
-	"setup" => SETUP,
-	"periodic" => PERIODIC,
-	"cancel" => CANCEL,
-	"foreach" => FOREACH,
-	"\\"     => SET_MINUS,
-	"!in"   => NOT_IN,
-	";" => SEMI_COLON,
-	"!exists"   => NOT_EXISTS,
-	"unite" => UNION,
-	"intersect" => INTERSECT,
-	"undefined" => UNDEFINED,
-	"." => DOT,
-	"continue" => CONTINUE,
-	"return" => RETURN,
-	"break" => BREAK,
-	r"\w+"  => STRING
+	"="				=> EQ,
+	"=="			=> COMP_EQ,
+	"and"			=> AND,
+	"upon"  		=> UPON,
+	"event" 		=> EVENT,
+	"do"    		=> DO,
+	":"     		=> COLON,
+	","     		=> COMMA,
+	"("     		=> OPEN_PAR,
+	")"     		=> CLOSE_PAR,
+	"["     		=> OPEN_BRA,
+	"]"     		=> CLOSE_BRA,
+	"{"     		=> OPEN_CURLY_BRA,
+	"}"     		=> CLOSE_CURLY_BRA,
+	"+" 			=> PLUS,
+	"-" 			=> MINUS,
+	"state" 		=> STATE,
+	"interface"		=> INTERFACE,
+	"requests"		=> REQUESTS,
+	"indications" 	=> INDICATIONS,
+	"trigger" 		=> TRIGGER,
+	"begin" 		=> BEGIN,
+	"end"   		=> END,
+	"if"    		=> IF,
+	"else"  		=> ELSE,
+	"elif"  		=> ELIF,
+	"then"  		=> THEN,
+	"in"    		=> IN,
+	"exists"		=> EXISTS,
+	"init"			=> INIT,
+	"timer" 		=> TIMER,
+	"crash" 		=> CRASH,
+	"procedure" 	=> PROCEDURE,
+	"call" 			=> CALL,
+	"setup" 		=> SETUP,
+	"periodic" 		=> PERIODIC,
+	"cancel" 		=> CANCEL,
+	"foreach" 		=> FOREACH,
+	"\\"     		=> SET_MINUS,
+	"!in"   		=> NOT_IN,
+	";" 			=> SEMI_COLON,
+	"!exists"   	=> NOT_EXISTS,
+	"unite" 		=> UNION,
+	"intersect" 	=> INTERSECT,
+	"undefined" 	=> UNDEFINED,
+	"." 			=> DOT,
+	"continue" 		=> CONTINUE,
+	"return" 		=> RETURN,
+	"break" 		=> BREAK,
+	"_"				=> UNDERSCORE,
+	r"[a-zA-Z0-9]+"  		=> STRING
 }

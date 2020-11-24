@@ -38,7 +38,7 @@ fn main() {
         .unwrap()
         .eval_translate();
 
-    let string_result: String = format!("{}\n{}\n{}", BEGIN!(), result, END!());
+    let string_result: String = format!("{}\n{}\n{}", begin!(), result, end!());
 
     if matches.is_present(OUTPUT) {
         write_to_file(matches.value_of(OUTPUT).unwrap(), &string_result);

@@ -92,24 +92,28 @@ pub enum Expr {
 	},
 	SetupTimer{
 		name: String,
-		args: Vec<String>,
+		args: Box<Expr>,
 	},
 	SetupPeriodicTimer{
 		name: String,
-		args: Vec<String>,
+		args: Box<Expr>,
 	},
 	CancelTimer{
 		name: String,
 	},
 	CancelTimerWithArgs{
 		name: String,
-		args: Vec<String>,
+		args: Box<Expr>,
 	},
 	ForEach{
 		condition: Box<Expr>,
 		body: Box<Expr>,
 	},
     String(String),
+    StringWithUnderscore{
+    	s: String,
+    	t: Box<Expr>,
+    },
     Special(Special),
     State {
         body: Box<Expr>,
@@ -171,7 +175,8 @@ pub enum Special {
 	CompEq,
 	Comma,
 	And,
-	Plus,
+    Plus,
+    Minus,
 }
 
 pub trait Translate {
@@ -181,7 +186,7 @@ pub trait Translate {
 impl Translate for Expr {
     fn eval_translate(self) -> String {
         match self {
-            Expr::Assign { name, value } => format!(ASSIGN_CODE!(), name.eval_translate(), value.eval_translate()),
+            Expr::Assign { name, value } => format!(assign_code!(), name.eval_translate(), value.eval_translate()),
             Expr::MultipleExpr { e1, e2 } => {
                 format!("{}\n\\;{}\n", e1.eval_translate(), e2.eval_translate())
             }
@@ -197,28 +202,29 @@ impl Translate for Expr {
 			Expr::SingleLineMultipleTermNoSpace { t1, t2 } => {
                 format!("{}{}", t1.eval_translate(), t2.eval_translate())
             }
-            Expr::Method { name, body } => format!(FUNCTION_CODE!(), name, body.eval_translate()),
+            Expr::Method { name, body } => format!(function_code!(), name, body.eval_translate()),
             Expr::MethodWithArgs { name, args, body } => format!(
-                FUNCTION_WITH_ARGS_CODE!(),
+                function_with_args_code!(),
                 name,
                 args.join(", "),
                 body.eval_translate()
             ),
-            Expr::Event { name, body } => format!(EVENT_CODE!(), name, body.eval_translate()),
+            Expr::Event { name, body } => format!(event_code!(), name, body.eval_translate()),
             Expr::EventWithArgs { name, args, body } => format!(
-                EVENT_WITH_ARGS_CODE!(),
+                event_with_args_code!(),
                 name,
                 args.join(", "),
                 body.eval_translate()
             ),
-			Expr::MethodCall { name} => format!(METHOD_CALL_CODE!(), name),
-			Expr::MethodCallWithArgs { name, args } => format!(METHOD_CALL_WITH_ARGS_CODE!(), name, args.eval_translate()),
-			Expr::ProcedureCall { name } => format!(PROCEDURE_CALL_CODE!(), name),
-			Expr::ProcedureCallWithArgs { name, args } => format!(PROCEDURE_CALL_WITH_ARGS_CODE!(), name, args.eval_translate()),
+			Expr::MethodCall { name} => format!(method_call_code!(), name),
+			Expr::MethodCallWithArgs { name, args } => format!(method_call_with_args_code!(), name, args.eval_translate()),
+			Expr::ProcedureCall { name } => format!(procedure_call_code!(), name),
+			Expr::ProcedureCallWithArgs { name, args } => format!(procedure_call_with_args_code!(), name, args.eval_translate()),
             Expr::String(s) => s,
+            Expr::StringWithUnderscore{s, t} => format!(string_with_underscore_code!(), s, t.eval_translate()),
             Expr::Special(s) => s.eval_translate(),
             Expr::If { condition, body } => format!(
-                IF_CODE!(),
+                if_code!(),
                 condition.eval_translate(),
                 body.eval_translate()
             ),
@@ -226,13 +232,13 @@ impl Translate for Expr {
                 condition,
                 else_if_body,
             } => format!(
-                ELSE_IF_CODE!(),
+                else_if_code!(),
                 condition.eval_translate(),
                 else_if_body.eval_translate()
             ),
-            Expr::Else { else_body } => format!(ELSE_CODE!(), else_body.eval_translate()),
+            Expr::Else { else_body } => format!(else_code!(), else_body.eval_translate()),
             Expr::IfComposed { condition, if_body } => format!(
-                IF_COMPOSED_CODE!(),
+                if_composed_code!(),
                 condition.eval_translate(),
                 if_body.eval_translate()
             ),
@@ -240,84 +246,84 @@ impl Translate for Expr {
                 condition,
                 else_if_body,
             } => format!(
-                ELSE_IF_COMPOSED_CODE!(),
+                else_if_composed_code!(),
                 condition.eval_translate(),
                 else_if_body.eval_translate()
 			),
 			Expr::Init{body} => format!(
-				INIT_CODE!(),
-				body.eval_translate()
+                init_code!(),
+                body.eval_translate()
 			),
 			Expr::InitWithArgs{args, body} => format!(
-				INIT_WITH_ARGS_CODE!(),
-				args.join(", "),
-				body.eval_translate()
+                init_with_args_code!(),
+                args.join(", "),
+                body.eval_translate()
 			),
 			Expr::Timer{name, body} => format!(
-				TIMER_CODE!(),
-				name,
-				body.eval_translate()
+                timer_code!(),
+                name,
+                body.eval_translate()
 			),
 			Expr::TimerWithArgs{name, args, body} => format!(
-				TIMER_WITH_ARGS_CODE!(),
-				name,
-				args.join(", "),
-				body.eval_translate()
+                timer_with_args_code!(),
+                name,
+                args.join(", "),
+                body.eval_translate()
 			),
 			Expr::CrashWithArgs{args, body} => format!(
-				CRASH_WITH_ARGS_CODE!(),
-				args.join(", "),
-				body.eval_translate()
+                crash_with_args_code!(),
+                args.join(", "),
+                body.eval_translate()
 			),
 			Expr::Procedure{name, body} => format!(
-				PROCEDURE_CODE!(),
-				name,
-				body.eval_translate()
+                procedure_code!(),
+                name,
+                body.eval_translate()
 			),
 			Expr::ProcedureWithArgs{name, args, body} => format!(
-				PROCEDURE_WITH_ARGS_CODE!(),
-				name,
-				args.join(", "),
-				body.eval_translate()
+                procedure_with_args_code!(),
+                name,
+                args.join(", "),
+                body.eval_translate()
 			),
 			Expr::SetupTimer{name, args} => format!(
-				SETUP_TIMER_CODE!(),
-				name,
-				args.join(", "),
+                setup_timer_code!(),
+                name,
+                args.join(", "),
 			),
 			Expr::SetupPeriodicTimer{name, args} => format!(
-				SETUP_PERIODIC_TIMER_CODE!(),
-				name,
-				args.join(", "),
+                setup_periodic_timer_code!(),
+                name,
+                args.join(", "),
 			),
 			Expr::CancelTimer{name} => format!(
-				CANCEL_TIMER_CODE!(),
-				name,
+                cancel_timer_code!(),
+                name,
 			),
 			Expr::CancelTimerWithArgs{name, args} => format!(
-				CANCEL_TIMER_WITH_ARGS_CODE!(),
-				name,
-				args.join(", "),
+                cancel_timer_with_args_code!(),
+                name,
+                args.join(", "),
 			),
 			Expr::ForEach{condition, body} => format!(
-				FOREACH_CODE!(),
-				condition.eval_translate(),
-				body.eval_translate(),
+                foreach_code!(),
+                condition.eval_translate(),
+                body.eval_translate(),
 			),
-            Expr::State { body } => format!(STATE_CODE!(), body.eval_translate()),
+            Expr::State { body } => format!(state_code!(), body.eval_translate()),
             Expr::Interface { reqs, indics } => format!(
-                INTERFACE_CODE!(),
+                interface_code!(),
                 reqs.eval_translate(),
                 indics.eval_translate()
             ),
-            Expr::Requests { requests } => format!(REQUESTS_CODE!(), requests.eval_translate()),
+            Expr::Requests { requests } => format!(requests_code!(), requests.eval_translate()),
             Expr::Indications { indications } => {
-                format!(INDICATIONS_CODE!(), indications.eval_translate())
+                format!(indications_code!(), indications.eval_translate())
             }
-            Expr::Trigger { method } => format!(TRIGGER_CODE!(), method.eval_translate()),
-            Expr::Return{} => format!(RETURN_CODE!()),
-            Expr::Continue{} => format!(CONTINUE_CODE!()),
-            Expr::Break{} => format!(BREAK_CODE!()),
+            Expr::Trigger { method } => format!(trigger_code!(), method.eval_translate()),
+            Expr::Return{} => format!(return_code!()),
+            Expr::Continue{} => format!(continue_code!()),
+            Expr::Break{} => format!(break_code!()),
             Expr::Empty => String::new(),
         }
     }
@@ -326,23 +332,24 @@ impl Translate for Expr {
 impl Translate for Special {
     fn eval_translate(self) -> String {
         match self {
-            Special::Exists => EXISTS_CODE!(),
-            Special::In => IN_CODE!(),
-            Special::NotExists => NOT_EXISTS_CODE!(),
-            Special::NotIn => NOT_IN_CODE!(),
-            Special::SetMinus => SET_MINUS_CODE!(),
-            Special::Union => UNION_CODE!(),
-            Special::Intersect => INTERSECT_CODE!(),
-            Special::Undefined => UNDEFINED_CODE!(),
-            Special::OpenBra => OPEN_BRA_CODE!(),
-            Special::CloseBra => CLOSE_BRA_CODE!(),
-            Special::OpenCurlyBra => OPEN_CURLY_BRA_CODE!(),
-            Special::CloseCurlyBra => CLOSE_CURLY_BRA_CODE!(),
-            Special::Dot => DOT_CODE!(),
-            Special::CompEq=> COMP_EQ_CODE!(),
-            Special::And => AND_CODE!(),
-            Special::Comma => COMMA_CODE!(),
-            Special::Plus => PLUS_CODE!(),
+            Special::Exists => exists_code!(),
+            Special::In => in_code!(),
+            Special::NotExists => not_exists_code!(),
+            Special::NotIn => not_in_code!(),
+            Special::SetMinus => set_minus_code!(),
+            Special::Union => union_code!(),
+            Special::Intersect => intersect_code!(),
+            Special::Undefined => undefined_code!(),
+            Special::OpenBra => open_bra_code!(),
+            Special::CloseBra => close_bra_code!(),
+            Special::OpenCurlyBra => open_curly_bra_code!(),
+            Special::CloseCurlyBra => close_curly_bra_code!(),
+            Special::Dot => dot_code!(),
+            Special::CompEq=> comp_eq_code!(),
+            Special::And => and_code!(),
+            Special::Comma => comma_code!(),
+            Special::Plus => plus_code!(),
+            Special::Minus => minus_code!(),
         }
         .to_string()
     }
