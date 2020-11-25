@@ -1,49 +1,49 @@
 macro_rules! begin {
-    () => ("\\documentclass{article}\n\
-    \\usepackage[utf8]{inputenc}\n\
-    \\usepackage[ruled,vlined,linesnumbered]{algorithm2e}\n\
-    \\usepackage{amssymb}\n\
-    \\begin{document}\n\
-    {{\\DontPrintSemicolon\n\
-    \\SetAlgoNoLine\n\
-    \\LinesNumberedHidden\n\
-    \\SetFuncSty{textbf}\n\
-    \\begin{algorithm}[ht]\n\
-    \\BlankLine\n\
-    \\BlankLine\n\
-    \\BlankLine\n")
+	() => ("\\documentclass{article}\n\
+	\\usepackage[utf8]{inputenc}\n\
+	\\usepackage[ruled,vlined,linesnumbered]{algorithm2e}\n\
+	\\usepackage{amssymb}\n\
+	\\begin{document}\n\
+	{{\\DontPrintSemicolon\n\
+	\\SetAlgoNoLine\n\
+	\\LinesNumberedHidden\n\
+	\\SetFuncSty{textbf}\n\
+	\\begin{algorithm}[ht]\n\
+	\\BlankLine\n\
+	\\BlankLine\n\
+	\\BlankLine\n")
 }
 
 macro_rules! end {
-    () => ("\\BlankLine\n\
-    \\BlankLine\n\
-    \\BlankLine\n\
-    \\end{algorithm}\n\
-    \\end{document}")
+	() => ("\\BlankLine\n\
+	\\BlankLine\n\
+	\\BlankLine\n\
+	\\end{algorithm}\n\
+	\\end{document}\n")
 }
 
 macro_rules! function_code {
-    () => ("\\SetKwFunction{{FunctionID}}{{{}}}\n\
-    \\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
-    \\Fn{{\\FunctionID{{}}}}{{\n\
-        {}\n
-    }}")
+	() => ("\\SetKwFunction{{FunctionID}}{{{}}}\n\
+	\\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
+	\\Fn{{\\FunctionID{{}}}}{{\n\
+	{}\n\
+	}}\n")
 }
 
 macro_rules! init_code {
-    () => ("\\SetKwFunction{{FunctionID}}{{Init}}
+	() => ("\\SetKwFunction{{FunctionID}}{{Init}}\n\
 	\\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
 	\\Fn{{\\FunctionID}}{{\n\
-		{}\n
-	}}");
+	{}\n\
+	}}\n");
 }
 
 macro_rules! init_with_args_code {
-    () => ("\\SetKwFunction{{FunctionID}}{{Init}}\n\
-    \\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
-    \\Fn{{\\FunctionID{{{}}}}}{{\n\
-        {}\n
-    }}")
+	() => ("\\SetKwFunction{{FunctionID}}{{Init}}\n\
+	\\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
+	\\Fn{{\\FunctionID{{{}}}}}{{\n\
+	{}\n\
+	}}\n")
 }
 
 macro_rules! foreach_code {
@@ -51,27 +51,27 @@ macro_rules! foreach_code {
 }
 
 macro_rules! timer_code {
-    () => ("\\SetKwFunction{{FunctionID}}{{Timer {}}}
+	() => ("\\SetKwFunction{{FunctionID}}{{Timer {}}}\n\
 	\\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
 	\\Fn{{\\FunctionID}}{{\n\
-		{}\n
-	}}");
+	{}\n\
+	}}\n");
 }
 
 macro_rules! timer_with_args_code {
-    () => ("\\SetKwFunction{{FunctionID}}{{Timer {}}}\n\
-    \\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
-    \\Fn{{\\FunctionID{{{}}}}}{{\n\
-        {}\n
-    }}")
+	() => ("\\SetKwFunction{{FunctionID}}{{Timer {}}}\n\
+	\\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
+	\\Fn{{\\FunctionID{{{}}}}}{{\n\
+	{}\n\
+	}}\n")
 }
 
 macro_rules! crash_with_args_code {
-    () => ("\\SetKwFunction{{FunctionID}}{{Crash}}\n\
-    \\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
-    \\Fn{{\\FunctionID{{{}}}}}{{\n\
-        {}\n
-    }}")
+	() => ("\\SetKwFunction{{FunctionID}}{{Crash}}\n\
+	\\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
+	\\Fn{{\\FunctionID{{{}}}}}{{\n\
+	{}\n\
+	}}\n")
 }
 
 macro_rules! string_with_underscore_code {
@@ -79,168 +79,168 @@ macro_rules! string_with_underscore_code {
 }
 
 macro_rules! procedure_code {
-    () => ("\\SetKwFunction{{FunctionID}}{{{}}}\n\
-    \\SetKwProg{{Fn}}{{Procedure }}{{:}}{{}}\n\
-    \\Fn{{\\FunctionID}}{{\n\
-        {}\n
-    }}")
+	() => ("\\SetKwFunction{{FunctionID}}{{{}}}\n\
+	\\SetKwProg{{Fn}}{{Procedure }}{{:}}{{}}\n\
+	\\Fn{{\\FunctionID}}{{\n\
+	{}\n\
+	}}\n")
 }
 
 macro_rules! procedure_with_args_code {
-    () => ("\\SetKwFunction{{FunctionID}}{{{}}}\n\
-    \\SetKwProg{{Fn}}{{Procedure }}{{:}}{{}}\n\
-    \\Fn{{\\FunctionID{{{}}}}}{{\n\
-        {}\n
-    }}")
+	() => ("\\SetKwFunction{{FunctionID}}{{{}}}\n\
+	\\SetKwProg{{Fn}}{{Procedure }}{{:}}{{}}\n\
+	\\Fn{{\\FunctionID{{{}}}}}{{\n\
+	{}\n\
+	}}\n")
 }
 
 macro_rules! event_code {
-    () => ("\\SetKwFunction{{FunctionID}}{{{}}}\n\
-    \\SetKwProg{{Fn}}{{Upon event }}{{ do:}}{{}}\n\
-    \\Fn{{\\FunctionID{{}}}}{{\n\
-        {}\n
-    }}")
+	() => ("\\SetKwFunction{{FunctionID}}{{{}}}\n\
+	\\SetKwProg{{Fn}}{{Upon event }}{{ do:}}{{}}\n\
+	\\Fn{{\\FunctionID{{}}}}{{\n\
+	{}\n\
+	}}\n")
 }
 
 macro_rules! function_with_args_code {
-    () => ("\\SetKwFunction{{FunctionID}}{{{}}}\n\
-    \\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
-    \\Fn{{\\FunctionID{{{}}}}}{{\n\
-        {}\n
-    }}")
+	() => ("\\SetKwFunction{{FunctionID}}{{{}}}\n\
+	\\SetKwProg{{Fn}}{{Upon }}{{ do:}}{{}}\n\
+	\\Fn{{\\FunctionID{{{}}}}}{{\n\
+	{}\n\
+	}}\n")
 }
 
 macro_rules! event_with_args_code {
-    () => ("\\SetKwFunction{{FunctionID}}{{{}}}\n\
-    \\SetKwProg{{Fn}}{{Upon event }}{{ do:}}{{}}\n\
-    \\Fn{{\\FunctionID{{{}}}}}{{\n\
-        {}\n
-    }}")
+	() => ("\\SetKwFunction{{FunctionID}}{{{}}}\n\
+	\\SetKwProg{{Fn}}{{Upon event }}{{ do:}}{{}}\n\
+	\\Fn{{\\FunctionID{{{}}}}}{{\n\
+	{}\n\
+	}}\n")
 }
 
 macro_rules! assign_code {
-    () => ("{} $\\longleftarrow$ {}")
+	() => ("{} $\\longleftarrow$ {}")
 }
 
 macro_rules! in_code {
-    () => ("$\\in$")
+	() => ("$\\in$")
 }
 
 macro_rules! not_in_code {
-    () => ("$\\notin$")
+	() => ("$\\notin$")
 }
 
 macro_rules! set_minus_code {
-    () => ("$\\setminus$")
+	() => ("$\\setminus$")
 }
 
 macro_rules! intersect_code {
-    () => ("$\\cap$")
+	() => ("$\\cap$")
 }
 
 macro_rules! union_code {
-    () => ("$\\cup$")
+	() => ("$\\cup$")
 }
 
 macro_rules! exists_code {
-    () => ("$\\exists$")
+	() => ("$\\exists$")
 }
 
 macro_rules! not_exists_code {
-    () => ("$\\nexists$")
+	() => ("$\\nexists$")
 }
 
 macro_rules! undefined_code {
-    () => ("$\\bot$")
+	() => ("$\\bot$")
 }
 
 macro_rules! if_code {
-    () => ("\\If{{{}}}{{{}}}");
+	() => ("\\If{{{}}}{{{}}}");
 }
 
 macro_rules! else_if_code {
-    () => ("\\ElseIf{{{}}}{{{}}}");
+	() => ("\\ElseIf{{{}}}{{{}}}");
 }
 
 macro_rules! else_code {
-    () => ("\\Else{{{}}}");
+	() => ("\\Else{{{}}}");
 }
 
 macro_rules! if_composed_code {
-    () => ("\\uIf{{{}}}{{{}}}");
+	() => ("\\uIf{{{}}}{{{}}}");
 }
 
 macro_rules! else_if_composed_code {
-    () => ("\\uElseIf{{{}}}{{{}}}");
+	() => ("\\uElseIf{{{}}}{{{}}}");
 }
 
 macro_rules! state_code {
-	() => ("\\SetKwFunction{{FunctionID}}{{State}}
-	\\SetKwProg{{Fn}}{{}}{{:}}{{}}
-	\\Fn{{\\FunctionID}}{{
-		{}
-	}}");
+	() => ("\\SetKwFunction{{FunctionID}}{{State}}\n\
+	\\SetKwProg{{Fn}}{{}}{{:}}{{}}\n\
+	\\Fn{{\\FunctionID}}{{\n\
+	{}\n\
+	}}\n");
 }
 
 macro_rules! requests_code {
-    () => ("\\SetKwFunction{{FunctionID}}{{Requests}}
-	\\SetKwProg{{Fn}}{{}}{{:}}{{}}
-	\\Fn{{\\FunctionID}}{{
-		{}
-	}}");
+	() => ("\\SetKwFunction{{FunctionID}}{{Requests}}\n\
+	\\SetKwProg{{Fn}}{{}}{{:}}{{}}\n\
+	\\Fn{{\\FunctionID}}{{\n\
+	{}\n\
+	}}\n");
 }
 
 macro_rules! indications_code {
-	() => ("\\SetKwFunction{{FunctionID}}{{Indications}}
-	\\SetKwProg{{Fn}}{{}}{{:}}{{}}
-	\\Fn{{\\FunctionID}}{{
-		{}
-	}}");
+	() => ("\\SetKwFunction{{FunctionID}}{{Indications}}\n\
+	\\SetKwProg{{Fn}}{{}}{{:}}{{}}\n\
+	\\Fn{{\\FunctionID}}{{\n\
+	{}\n\
+	}}\n");
 }
 
 macro_rules! interface_code {
-    () => ("\\SetKwFunction{{FunctionID}}{{Indications}}
-	\\SetKwProg{{Fn}}{{}}{{:}}{{}}
-	\\Fn{{\\FunctionID}}{{
-		{}\\;\n\
-    	{}\n
-	}}");
+	() => ("\\SetKwFunction{{FunctionID}}{{Indications}}\n\
+	\\SetKwProg{{Fn}}{{}}{{:}}{{}}\n\
+	\\Fn{{\\FunctionID}}{{\n\
+	{}\\;\n\
+	{}\n\
+	}}\n");
 }
 
 macro_rules! method_call_code {
-    () => ("\\FuncSty{{{}(}}\\ArgSty{{}}\\FuncSty{{)}}");
+	() => ("\\FuncSty{{{}(}}\\ArgSty{{}}\\FuncSty{{)}}");
 }
 
 macro_rules! method_call_with_args_code {
-    () => ("\\FuncSty{{{}(}}\\ArgSty{{{}}}\\FuncSty{{)}}");
+	() => ("\\FuncSty{{{}(}}\\ArgSty{{{}}}\\FuncSty{{)}}");
 }
 
 macro_rules! setup_timer_code {
-    () => ("\\FuncSty{{Setup Timer {}(}}\\ArgSty{{{}}}\\FuncSty{{)}}");
+	() => ("\\FuncSty{{Setup Timer {}(}}\\ArgSty{{{}}}\\FuncSty{{)}}");
 }
 
 macro_rules! cancel_timer_code {
-    () => ("\\FuncSty{{Cancel Timer {}}}\\ArgSty{{}}\\FuncSty{{}}");
+	() => ("\\FuncSty{{Cancel Timer {}}}\\ArgSty{{}}\\FuncSty{{}}");
 }
 
 macro_rules! cancel_timer_with_args_code {
-    () => ("\\FuncSty{{Cancel Timer {}(}}\\ArgSty{{{}}}\\FuncSty{{)}}");
+	() => ("\\FuncSty{{Cancel Timer {}(}}\\ArgSty{{{}}}\\FuncSty{{)}}");
 }
 
 macro_rules! setup_periodic_timer_code {
-    () => ("\\FuncSty{{Setup Periodic Timer {}(}}\\ArgSty{{{}}}\\FuncSty{{)}}");
+	() => ("\\FuncSty{{Setup Periodic Timer {}(}}\\ArgSty{{{}}}\\FuncSty{{)}}");
 }
 
 macro_rules! procedure_call_code {
-    () => ("\\FuncSty{{Call {}(}}\\ArgSty{{}}\\FuncSty{{)}}");
+	() => ("\\FuncSty{{Call {}(}}\\ArgSty{{}}\\FuncSty{{)}}");
 }
 
 macro_rules! procedure_call_with_args_code {
-    () => ("\\FuncSty{{Call {}(}}\\ArgSty{{{}}}\\FuncSty{{)}}");
+	() => ("\\FuncSty{{Call {}(}}\\ArgSty{{{}}}\\FuncSty{{)}}");
 }
 
 macro_rules! trigger_code {
-    () => ("\\FuncSty{{Trigger}} {}");
+	() => ("\\FuncSty{{Trigger}} {}");
 }
 
 macro_rules! open_bra_code {
@@ -296,17 +296,17 @@ macro_rules! minus_code {
 }
 
 macro_rules! operation_code {
-    () => ("{} {} {}");
+	() => ("{} {} {}");
 }
 
 macro_rules! access_code {
-    () => ("{}[{}]");
+	() => ("{}[{}]");
 }
 
 macro_rules! set_code {
-    () => ("\\{{{}\\}}");
+	() => ("\\{{{}\\}}");
 }
 
 macro_rules! empty_set_code {
-    () => ("\\{{\\}}");
+	() => ("\\{{\\}}");
 }

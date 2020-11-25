@@ -23,8 +23,13 @@ pub State: Expr = {
 };
 
 pub MultipleIds: Expr = {
-	<id: Id> => Expr::String(id.to_string()),
-	<id1: Id> <m: MultipleIds> => Expr::MultipleExpr{e1: Box::new(Expr::String(id1.to_string())), e2: Box::new(m)}
+	<id: Id> SEMI_COLON => Expr::String(id.to_string()),
+	<id: Id> <c: Comment> SEMI_COLON => Expr::MultipleExprNoNewLine{e1: Box::new(Expr::String(id.to_string())), e2: Box::new(c)},
+	<id1: Id> SEMI_COLON <m: MultipleIds>=> Expr::MultipleExpr{e1: Box::new(Expr::String(id1.to_string())), e2:
+	Box::new(m)},
+	<id1: Id> <c: Comment> SEMI_COLON <m: MultipleIds> => Expr::MultipleExpr{
+	e1:Box::new(Expr::MultipleExprNoNewLine{e1: Box::new(Expr::String(id1.to_string())), e2: Box::new(c)}),
+	e2: Box::new(m)},
 }
 
 pub Interface: Expr = {
@@ -150,6 +155,7 @@ pub Body: Expr = {
 };
 
 pub BodyLine: Expr = {
+	<e: Comment> SEMI_COLON => e,
 	<e: Assign> SEMI_COLON => e,
 	<e: Trigger> SEMI_COLON => e,
 	<e: MethodCall> SEMI_COLON => e,
@@ -157,6 +163,15 @@ pub BodyLine: Expr = {
 	<e: SetupTimer> SEMI_COLON => e,
 	<e: CancelTimer> SEMI_COLON => e,
 	<e: Control> SEMI_COLON => e,
+};
+
+pub Comment: Expr = {
+	DOUBLE_FORWARD_SLASH <e: MultiString> => Expr::Comment{strings: e},
+};
+
+pub MultiString: Vec<String> = {
+	<s: STRING> => vec![s.to_string()],
+    <s: STRING> <mut ss: MultiString> => { let mut res = vec![s.to_string()]; res.append(&mut ss); res }
 };
 
 pub MultiMethodCall: Expr = {
@@ -366,6 +381,7 @@ match {
 	"}"     		=> CLOSE_CURLY_BRA,
 	"+" 			=> PLUS,
 	"-" 			=> MINUS,
+	"//"			=> DOUBLE_FORWARD_SLASH,
 	"state" 		=> STATE,
 	"interface"		=> INTERFACE,
 	"requests"		=> REQUESTS,
