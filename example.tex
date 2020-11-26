@@ -1,0 +1,167 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\usepackage{amssymb}
+\begin{document}
+{{\DontPrintSemicolon
+\SetAlgoNoLine
+\LinesNumberedHidden
+\SetFuncSty{textbf}
+\begin{algorithm}[ht]
+\BlankLine
+\BlankLine
+\BlankLine
+
+\SetKwFunction{FunctionID}{State}
+\SetKwProg{Fn}{}{:}{}
+\Fn{\FunctionID}{
+parents
+//these are parents
+\;services
+\;myId
+\;fallback
+}
+
+\;\SetKwFunction{FunctionID}{Init}
+\SetKwProg{Fn}{Upon }{ do:}{}
+\Fn{\FunctionID}{
+fallback $\longleftarrow$ \FuncSty{getFallback(}\ArgSty{}\FuncSty{)}
+\;myId $\longleftarrow$ \FuncSty{randomString(}\ArgSty{}\FuncSty{)}
+}
+
+\;\SetKwFunction{FunctionID}{Receive}
+\SetKwProg{Fn}{Upon event }{ do:}{}
+\Fn{\FunctionID{QUALITY\_NOT\_ASSURED, service, location}}{
+newChild $\longleftarrow$ \FuncSty{getNodeClosestTo(}\ArgSty{location}\FuncSty{)}
+\;\FuncSty{Trigger} \FuncSty{Send(}\ArgSty{DEPLOY\_SERVICE, newChild, service, myself}\FuncSty{)}
+\;\FuncSty{Call addChild(}\ArgSty{service, newChild}\FuncSty{)}
+}
+
+\;\SetKwFunction{FunctionID}{Receive}
+\SetKwProg{Fn}{Upon event }{ do:}{}
+\Fn{\FunctionID{DEPLOY\_SERVICE, service, sender}}{
+\If{service $\notin$ services}{services $\longleftarrow$ services $\cup$ \{service\}}
+\;\FuncSty{Call updateParent(}\ArgSty{service, sender}\FuncSty{)}
+}
+
+\;\SetKwFunction{FunctionID}{updateParent}
+\SetKwProg{Fn}{Procedure }{:}{}
+\Fn{\FunctionID{service, parent}}{
+\If{service.Parent == parent}{return}
+\;parents $\longleftarrow$ parents $\cup$ \{parent\}
+\;service.parent $\longleftarrow$ parent
+\;\ForEach{child $\in$ service.children}{\FuncSty{Trigger} \FuncSty{Send(}\ArgSty{GRANDPARENT, child, service, parent, myself}\FuncSty{)}}
+}
+
+\;\SetKwFunction{FunctionID}{Receive}
+\SetKwProg{Fn}{Upon event }{ do:}{}
+\Fn{\FunctionID{GRANDPARENT, service, grandparent, sender}}{
+service.grandparent $\longleftarrow$ grandparent
+}
+
+\;\SetKwFunction{FunctionID}{updateChildren}
+\SetKwProg{Fn}{Procedure }{:}{}
+\Fn{\FunctionID{service}}{
+orderedChild $\longleftarrow$ \FuncSty{order(}\ArgSty{service.children}\FuncSty{)}
+\;\ForEach{child $\in$ service.children}{\FuncSty{Trigger} \FuncSty{Send(}\ArgSty{SIBLINGS, child, service, orderedChild}\FuncSty{)}}
+}
+
+\;\SetKwFunction{FunctionID}{addChild}
+\SetKwProg{Fn}{Procedure }{:}{}
+\Fn{\FunctionID{service, child}}{
+\If{child $\notin$ children}{children $\longleftarrow$ children $\cup$ \{child\}}
+\;\If{child $\notin$ service.children}{service.children $\longleftarrow$ service.children $\cup$ \{child\}
+\;servicesByChild[child] $\longleftarrow$ servicesByChild[child] $\cup$ \{service\}
+\;\FuncSty{Call updateChildren(}\ArgSty{service}\FuncSty{)}}
+}
+
+\;\SetKwFunction{FunctionID}{deleteChild}
+\SetKwProg{Fn}{Procedure }{:}{}
+\Fn{\FunctionID{child}}{
+children $\longleftarrow$ children $\setminus$ \{child\}
+\;childServices $\longleftarrow$ servicesByChild[child]
+\;\ForEach{service $\in$ childServices}{service.children $\longleftarrow$ service.children $\setminus$ \{child\}
+\;\FuncSty{Call updateChildren(}\ArgSty{service}\FuncSty{)}}
+}
+
+\;\SetKwFunction{FunctionID}{Receive}
+\SetKwProg{Fn}{Upon event }{ do:}{}
+\Fn{\FunctionID{SIBLINGS, service, siblings, sender}}{
+service.siblings $\longleftarrow$ siblings
+}
+
+\;\SetKwFunction{FunctionID}{Receive}
+\SetKwProg{Fn}{Upon event }{ do:}{}
+\Fn{\FunctionID{REPAIR\_SERVICE, service, targets, sender}}{
+\FuncSty{Trigger} \FuncSty{Send(}\ArgSty{DEPLOY\_SERVICE, myself, service, sender}\FuncSty{)}
+\;childTargets $\longleftarrow$ \{\}
+\;\ForEach{target $\in$ targets}{\If{target == myId}{continue}
+\;\uIf{target $\in$ children}{\FuncSty{Call addChild(}\ArgSty{service, target}\FuncSty{)}
+\;\FuncSty{Trigger} \FuncSty{Send(}\ArgSty{REPAIR\_SERVICE, target, service, target, myself}\FuncSty{)}}
+\Else{newChild $\longleftarrow$ \FuncSty{getNodeClosestTo(}\ArgSty{target.location}\FuncSty{)}
+\;\If{newChild == myId}{continue}
+\;targets $\longleftarrow$ \{\}
+\;\If{newChild $\in$ childTargets}{targets $\longleftarrow$ childTargets[newChild]}
+\;targets $\longleftarrow$ targets $\cup$ \{target\}
+\;childTargets[newChild] $\longleftarrow$ targets}}
+\;\ForEach{child $\in$ childTargets}{\FuncSty{Trigger} \FuncSty{Send(}\ArgSty{REPAIR\_SERVICE, newChild, service, childTargets[child], myself}\FuncSty{)}}
+}
+
+\;\SetKwFunction{FunctionID}{Receive}
+\SetKwProg{Fn}{Upon event }{ do:}{}
+\Fn{\FunctionID{DEAD\_CHILD, deadChild, service, orphanGrandchildren, sender}}{
+\FuncSty{Call deleteChild(}\ArgSty{deadChild}\FuncSty{)}
+\;childTargets $\longleftarrow$ \{\}
+\;\ForEach{grandchild $\in$ orphanGrandchildren}{child $\longleftarrow$ \FuncSty{getNodeClosestTo(}\ArgSty{grandChild.location}\FuncSty{)}
+\;\uIf{child $\notin$ childTargets}{childTargets[child] $\longleftarrow$ \{\}
+\;targets $\longleftarrow$ \{\}}
+\Else{targets $\longleftarrow$ newChildren[child]}
+\;targets $\longleftarrow$ targets $\cup$ \{grandchild\}
+\;childTargets[child] $\longleftarrow$ targets}
+\;\ForEach{newChild $\in$ newChildren}{\FuncSty{Trigger} \FuncSty{Send(}\ArgSty{REPAIR\_SERVICE, newChild, service, childTargets[newChild], myself}\FuncSty{)}}
+}
+
+\;\SetKwFunction{FunctionID}{NeighborDown}
+\SetKwProg{Fn}{Upon event }{ do:}{}
+\Fn{\FunctionID{node}}{
+\If{node $\in$ parents}{parents $\longleftarrow$ parents $\setminus$ node
+\;\FuncSty{Call startRepair(}\ArgSty{node, 0}\FuncSty{)}}
+\;\If{node $\in$ children}{\FuncSty{Call deleteChild(}\ArgSty{node}\FuncSty{)}
+\;childServices $\longleftarrow$ servicesByChild[child]
+\;\ForEach{service $\in$ childServices}{\FuncSty{Trigger} \FuncSty{Send(}\ArgSty{REPAIR\_SERVICE, myself, service, child, service.parent}\FuncSty{)}}}
+}
+
+\;\SetKwFunction{FunctionID}{startRepair}
+\SetKwProg{Fn}{Procedure }{:}{}
+\Fn{\FunctionID{service, attemptNumber}}{
+\uIf{service.siblings[0] == myId}{orphanChildren $\longleftarrow$ service.siblings $\cup$ \{myself\}
+\;\FuncSty{Trigger} \FuncSty{Send(}\ArgSty{DEAD\_CHILD, service.grandparent, service.parent, service, orphanChildren, myself}\FuncSty{)}}
+\Else{\FuncSty{Setup Timer WaitingForParent(}\ArgSty{smallTimeout, service, attemptNumber}\FuncSty{)}}
+}
+
+\;\SetKwFunction{FunctionID}{fallback}
+\SetKwProg{Fn}{Procedure }{:}{}
+\Fn{\FunctionID{service}}{
+targets $\longleftarrow$ service.siblings $\cup$ \{myself\}
+\;\FuncSty{Trigger} \FuncSty{Send(}\ArgSty{REPAIR\_SERVICE, fallback, service, targets, myself}\FuncSty{)}
+}
+
+\;\SetKwFunction{FunctionID}{Receive}
+\SetKwProg{Fn}{Upon event }{ do:}{}
+\Fn{\FunctionID{FALLING\_BACK, service, attemptNumber}}{
+\FuncSty{Cancel Timer WaitingForParent}\ArgSty{}\FuncSty{}
+\;\FuncSty{Setup Timer WaitingForParent(}\ArgSty{fallbackTimeout, service, attemptNumber}\FuncSty{)}
+}
+
+\;\SetKwFunction{FunctionID}{Timer WaitingForParent}
+\SetKwProg{Fn}{Upon }{ do:}{}
+\Fn{\FunctionID{service, attemptNumber}}{
+attemptNumber $\longleftarrow$ attemptNumber + 1
+\;\FuncSty{Call StartRepair(}\ArgSty{service, attemptNumber}\FuncSty{)}
+}
+
+\BlankLine
+\BlankLine
+\BlankLine
+\end{algorithm}
+\end{document}

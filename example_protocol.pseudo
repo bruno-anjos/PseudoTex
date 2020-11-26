@@ -1,0 +1,143 @@
+state:
+	parents // these are parents ;
+	services;
+	myId;
+	fallback;
+
+upon init do:
+	fallback = getFallback();
+	myId = randomString();
+
+upon event Receive(QUALITY_NOT_ASSURED, service, location) do:
+	newChild = getNodeClosestTo(location);
+	trigger Send(DEPLOY_SERVICE, newChild, service, myself);
+	call addChild(service, newChild);
+
+upon event Receive(DEPLOY_SERVICE, service, sender) do:
+	if service !in services:
+		services = services unite {service};
+	end
+	call updateParent(service, sender);
+
+procedure updateParent(service, parent):
+	if service.Parent == parent:
+		return;
+	end
+	parents = parents unite {parent};
+	service.parent = parent;
+	foreach child in service.children:
+		trigger Send(GRANDPARENT, child, service, parent, myself);
+	end
+
+upon event Receive(GRANDPARENT, service, grandparent, sender) do:
+	service.grandparent = grandparent;
+
+procedure updateChildren(service):
+	orderedChild = order(service.children);
+	foreach child in service.children:
+		trigger Send(SIBLINGS, child, service, orderedChild);
+	end
+
+procedure addChild(service, child):
+	if child !in children:
+		children = children unite {child};
+	end
+
+	if child !in service.children:
+		service.children = service.children unite {child};
+		servicesByChild[child] = servicesByChild[child] unite {service};
+		call updateChildren(service);
+	end
+
+procedure deleteChild(child):
+	children = children \ { child };
+	childServices = servicesByChild[child];
+	foreach service in childServices:
+		service.children = service.children \ {child};
+		call updateChildren(service);
+	end
+
+upon event Receive(SIBLINGS, service, siblings, sender) do:
+	service.siblings = siblings;
+
+upon event Receive(REPAIR_SERVICE, service, targets, sender) do:
+	trigger Send(DEPLOY_SERVICE, myself, service, sender);
+
+	childTargets = {};
+	foreach target in targets:
+		if target == myId:
+			continue;
+		end
+		if target in children:
+			call addChild(service, target);
+			trigger Send(REPAIR_SERVICE, target, service, target, myself);
+		else:
+			newChild = getNodeClosestTo(target.location);
+			if newChild == myId:
+				continue;
+			end
+			targets = {};
+			if newChild in childTargets:
+				targets = childTargets[newChild];
+			end
+			targets = targets unite {target};
+			childTargets[newChild] = targets;
+		end
+	end
+
+	foreach child in childTargets:
+		trigger Send(REPAIR_SERVICE, newChild, service, childTargets[child], myself);
+	end
+
+upon event Receive(DEAD_CHILD, deadChild, service, orphanGrandchildren, sender) do:
+	call deleteChild(deadChild);
+	childTargets = {};
+
+	foreach grandchild in orphanGrandchildren:
+		child = getNodeClosestTo(grandChild.location);
+		if child !in childTargets:
+			childTargets[child] = {};
+			targets = {};
+		else:
+			targets = newChildren[child];
+		end
+		targets = targets unite {grandchild};
+		childTargets[child] = targets;
+	end
+
+	foreach newChild in newChildren:
+		trigger Send(REPAIR_SERVICE, newChild, service, childTargets[newChild], myself);
+	end
+
+upon event NeighborDown(node) do:
+	if node in parents:
+		parents = parents \ node;
+		call startRepair(node, 0);
+	end
+	if node in children:
+		call deleteChild(node);
+		childServices = servicesByChild[child];
+		foreach service in childServices:
+			trigger Send(REPAIR_SERVICE, myself, service, child, service.parent);
+		end
+	end
+
+procedure startRepair(service, attemptNumber):
+	if service.siblings[0] == myId:
+		orphanChildren = service.siblings unite {myself};
+		trigger Send(DEAD_CHILD, service.grandparent, service.parent, service, orphanChildren, myself);
+	else:
+		setup timer WaitingForParent(smallTimeout, service, attemptNumber);
+	end
+
+procedure fallback(service):
+	targets = service.siblings unite {myself};
+	trigger Send(REPAIR_SERVICE, fallback, service, targets, myself);
+
+upon event Receive(FALLING_BACK, service, attemptNumber) do:
+	cancel timer WaitingForParent;
+	setup timer WaitingForParent(fallbackTimeout, service, attemptNumber);
+
+upon timer WaitingForParent(service, attemptNumber) do:
+	attemptNumber = attemptNumber + 1;
+	call StartRepair(service, attemptNumber);
