@@ -63,7 +63,7 @@ branch. Pull requests are warmly welcome.
 Project dependencies:
 - [LALRPOP](http://lalrpop.github.io/lalrpop/)
 - [clap](https://clap.rs)
-- algorithm2e Latex Package
+- algorithm2e LaTex Package
 
 
 ## Licensing
