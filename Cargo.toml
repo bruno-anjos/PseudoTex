@@ -1,6 +1,6 @@
 [package]
 name = "pseudotex"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Bruno Anjos <bruno.vale.anjos@gmail.com>"]
 edition = "2018"
 build = "build.rs"
