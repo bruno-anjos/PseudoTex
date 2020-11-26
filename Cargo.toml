@@ -11,6 +11,13 @@ repository = "https://github.com/bruno-anjos/PseudoTex"
 homepage = "https://github.com/bruno-anjos/PseudoTex"
 documentation = "https://docs.rs/pseudotex"
 readme = "README.md"
+exclude = [
+	"example.pdf",
+	"example.tex",
+	"example_protocol.pseudo",
+	"PseudoCodeNodes.pdf",
+	"algorithm2e.pdf"
+]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
