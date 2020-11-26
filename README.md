@@ -16,9 +16,7 @@ For now there are two ways of installing PseudoTex, either by using `cargo` or b
 
 ### Using latest release
 
-```shell
-λ ~/ $ wget https://github.com/bruno-anjos/PseudoTex
-```
+Go to the repository Releases page and download the binary (Linux or macOS).
 
 ### Running
 
