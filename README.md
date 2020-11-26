@@ -24,7 +24,7 @@ For now there are two ways of installing PseudoTex, either by using `cargo` or b
 
 ```shell
 λ ~/ $ pseudotex --help
-PseudoTex 0.1-alpha
+PseudoTex 1.0
 Bruno Anjos <bruno.vale.anjos@gmail.com>
 pseudocode transpiler to latex representation
 
