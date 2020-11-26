@@ -1,36 +1,29 @@
 # PseudoTex
 > PseudoTex is a compiler that translates pseudocode into its LaTex representation
 
-In university i had to do a few reports in LaTex that had pseudocode. Translating
-the simple pseudocode to the LaTex commands was a huge struggle so i decided to make
-this tool that translates a simple pseudocode language into the LaTex equivalent
-commands. I hope it makes you life easier :grin:.
+In university i had to do a few reports in LaTex that had pseudocode. Translating the simple pseudocode to the LaTex commands was a huge struggle so i decided to make this tool that translates a simple pseudocode language into the LaTex equivalent commands. I hope it makes you life easier :grin:.
 
-The pseudocode that PseudoTex follows is formalized in this [paper](PseudoCodeNotes.pdf)
-by João Leitão.
+The pseudocode that PseudoTex follows is somewhat formalized in this [paper](PseudoCodeNotes.pdf) by João Leitão (check [caveats](#Caveats)).
 
 ## Installing
+For now there are two ways of installing PseudoTex, either by using `cargo` or by downloading the latest binary release.
 
-For now to install the tool you have to clone the repo and have rust and cargo
-installed. The following command will create a directory with the repository
-in you current folder.
+### Using cargo
 
 ```shell
-λ ~/git/ $ git clone https://github.com/bruno-anjos/PseudoTex.git
+λ ~/ $ cargo install pseudotex
 ```
 
-This command will create a directory named PseudoTex with the repository's content
-in it.
+### Using latest release
+
+```shell
+λ ~/ $ wget https://github.com/bruno-anjos/PseudoTex
+```
 
 ### Running
 
-For now since it is still in a very early stage, to run you need to build the
-project through cargo. There is a symbolic link that aims to the binary created in the
-debug folder.
-
 ```shell
-λ ~/git/PseudoTex/ $ cargo build
-λ ~/git/PseudoTex/ $ ./pseudotex --help
+λ ~/ $ pseudotex --help
 PseudoTex 0.1-alpha
 Bruno Anjos <bruno.vale.anjos@gmail.com>
 pseudocode transpiler to latex representation
@@ -47,39 +40,11 @@ OPTIONS:
     -o, --output <output>    file name to write content to
 ```
 
+## Caveats
 
+### Semi Colons
 
-## Features
-
-PseudoTex uses [clap](https://clap.rs) for CLI argument parsing.
-
-PseudoTex supports:
-* state
-* interface
-    + requests
-    + indications
-* init
-* functions
-* variables
-* if
-* if/else
-* if/else if
-* if/else if/else
-* events
-* triggers
-* procedures
-* foreach
-* setup timers
-* setup periodic timers
-* cancel timers
-* cancel timers with args
-* special symbols:
-	+ in
-	+ exists
-    + set operators
-    + not in
-    + not exists
-    + undefined value
+One main difference from the language examplified in the paper is that this every statement has to be followed by a semi colon. I believe this can be changed in the future, but since this made the parser easier to build i decided to take this approach.
 
 ## TODO
 
@@ -97,6 +62,8 @@ branch. Pull requests are warmly welcome.
 
 Project dependencies:
 - [LALRPOP](http://lalrpop.github.io/lalrpop/)
+- [clap](https://clap.rs)
+- algorithm2e Latex Package
 
 
 ## Licensing
