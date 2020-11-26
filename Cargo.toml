@@ -15,7 +15,7 @@ exclude = [
 	"example.pdf",
 	"example.tex",
 	"example_protocol.pseudo",
-	"PseudoCodeNodes.pdf",
+	"PseudoCodeNotes.pdf",
 	"algorithm2e.pdf"
 ]
 
