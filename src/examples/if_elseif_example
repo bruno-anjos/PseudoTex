@@ -1,8 +1,0 @@
-upon teste(arg1, arg2) do:
-	ola = falso;
-	teste = falso;
-	if a in set then
-		ola = true;
-	elif a not in set then
-		ola = false;
-	end

@@ -1,4 +1,0 @@
-upon init do:
-	for each a !in set do:
-		test = a;
-	end

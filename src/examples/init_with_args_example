@@ -1,4 +1,0 @@
-state:
-	ola
-upon init(valor1, valor2) do:
-	ola = valor;

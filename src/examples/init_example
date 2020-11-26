@@ -1,4 +1,0 @@
-state:
-	ola
-upon init do:
-	ola = falso;
