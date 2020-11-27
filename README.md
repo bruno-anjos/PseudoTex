@@ -1,7 +1,7 @@
 # PseudoTex
 > PseudoTex is a compiler that translates pseudocode into its LaTex representation
 
-In university i had to do a few reports in LaTex that had pseudocode. Translating the simple pseudocode to the LaTex commands was a huge struggle so i decided to make this tool that translates a simple pseudocode language into the LaTex equivalent commands. I hope it makes you life easier :grin:.
+In university i had to do a few reports in LaTex that had pseudocode. Translating the simple pseudocode to the LaTex commands was a huge struggle so i decided to make this tool that translates a simple pseudocode language into the LaTex equivalent commands. I hope it makes your life easier :grin:.
 
 The pseudocode that PseudoTex follows is somewhat formalized in this [paper](PseudoCodeNotes.pdf) by João Leitão (check [caveats](#Caveats)).
 
@@ -42,7 +42,7 @@ OPTIONS:
 
 ### Semi Colons
 
-One main difference from the language examplified in the paper is that this every statement has to be followed by a semi colon. I believe this can be changed in the future, but since this made the parser easier to build i decided to take this approach.
+One main difference from the language described in the paper, is that every statement has to be followed by a semi colon. I believe this can be changed in the future, but since this made the parser easier to build i decided to take this approach.
 
 ## TODO
 
