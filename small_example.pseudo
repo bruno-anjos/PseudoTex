@@ -1,0 +1,50 @@
+state:
+    parents // these are parents ;
+    services;
+    myId;
+    fallback;
+
+upon init do:
+    fallback = getFallback();
+    myId = randomString();
+
+upon event Receive(QUALITY_NOT_ASSURED, service, location) do:
+    newChild = getNodeClosestTo(location);
+    trigger Send(DEPLOY_SERVICE, newChild, service, myself);
+    call addChild(service, newChild);
+
+upon event Receive(DEPLOY_SERVICE, service, sender) do:
+    if service !in services:
+        services = services unite {service};
+    end
+    call updateParent(service, sender);
+
+procedure updateParent(service, parent):
+    if service.Parent == parent:
+        return;
+    end
+    parents = parents unite {parent};
+    service.parent = parent;
+    foreach child in service.children:
+        trigger Send(GRANDPARENT, child, service, parent, myself);
+    end
+
+upon event Receive(GRANDPARENT, service, grandparent, sender) do:
+    service.grandparent = grandparent;
+
+procedure updateChildren(service):
+    orderedChild = order(service.children);
+    foreach child in service.children:
+        trigger Send(SIBLINGS, child, service, orderedChild);
+    end
+
+procedure addChild(service, child):
+    if child !in children:
+        children = children unite {child};
+    end
+
+    if child !in service.children:
+        service.children = service.children unite {child};
+        servicesByChild[child] = servicesByChild[child] unite {service};
+        call updateChildren(service);
+    end

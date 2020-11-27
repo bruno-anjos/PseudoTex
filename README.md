@@ -63,6 +63,153 @@ Project dependencies:
 - [clap](https://clap.rs)
 - algorithm2e LaTex Package
 
+## Example
+
+Here is a small example (check [example_protocol.pseudo](/example_protocol.pseudo))
+
+```pseudo
+state:
+    parents // these are parents ;
+    services;
+    myId;
+    fallback;
+
+upon init do:
+    fallback = getFallback();
+    myId = randomString();
+
+upon event Receive(QUALITY_NOT_ASSURED, service, location) do:
+    newChild = getNodeClosestTo(location);
+    trigger Send(DEPLOY_SERVICE, newChild, service, myself);
+    call addChild(service, newChild);
+
+upon event Receive(DEPLOY_SERVICE, service, sender) do:
+    if service !in services:
+        services = services unite {service};
+    end
+    call updateParent(service, sender);
+
+procedure updateParent(service, parent):
+    if service.Parent == parent:
+        return;
+    end
+    parents = parents unite {parent};
+    service.parent = parent;
+    foreach child in service.children:
+        trigger Send(GRANDPARENT, child, service, parent, myself);
+    end
+
+upon event Receive(GRANDPARENT, service, grandparent, sender) do:
+    service.grandparent = grandparent;
+
+procedure updateChildren(service):
+    orderedChild = order(service.children);
+    foreach child in service.children:
+        trigger Send(SIBLINGS, child, service, orderedChild);
+    end
+
+procedure addChild(service, child):
+    if child !in children:
+        children = children unite {child};
+    end
+
+    if child !in service.children:
+        service.children = service.children unite {child};
+        servicesByChild[child] = servicesByChild[child] unite {service};
+        call updateChildren(service);
+    end
+```
+
+This pseudocode generates the following LaTeX:
+
+```Latex
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\usepackage{amssymb}
+\begin{document}
+{{\DontPrintSemicolon
+\SetAlgoNoLine
+\LinesNumberedHidden
+\SetFuncSty{textbf}
+\begin{algorithm}[ht]
+\BlankLine
+\BlankLine
+\BlankLine
+
+\SetKwFunction{FunctionID}{State}
+\SetKwProg{Fn}{}{:}{}
+\Fn{\FunctionID}{
+parents
+// these are parents
+\;services
+\;myId
+\;fallback
+}
+
+\;\SetKwFunction{FunctionID}{Init}
+\SetKwProg{Fn}{Upon }{ do:}{}
+\Fn{\FunctionID}{
+fallback $\longleftarrow$ \FuncSty{getFallback(}\ArgSty{}\FuncSty{)}
+\;myId $\longleftarrow$ \FuncSty{randomString(}\ArgSty{}\FuncSty{)}
+}
+
+\;\SetKwFunction{FunctionID}{Receive}
+\SetKwProg{Fn}{Upon event }{ do:}{}
+\Fn{\FunctionID{QUALITY\_NOT\_ASSURED, service, location}}{
+newChild $\longleftarrow$ \FuncSty{getNodeClosestTo(}\ArgSty{location}\FuncSty{)}
+\;\FuncSty{Trigger} \FuncSty{Send(}\ArgSty{DEPLOY\_SERVICE, newChild, service, myself}\FuncSty{)}
+\;\FuncSty{Call addChild(}\ArgSty{service, newChild}\FuncSty{)}
+}
+
+\;\SetKwFunction{FunctionID}{Receive}
+\SetKwProg{Fn}{Upon event }{ do:}{}
+\Fn{\FunctionID{DEPLOY\_SERVICE, service, sender}}{
+\If{service $\notin$ services}{services $\longleftarrow$ services $\cup$ \{service\}}
+\;\FuncSty{Call updateParent(}\ArgSty{service, sender}\FuncSty{)}
+}
+
+\;\SetKwFunction{FunctionID}{updateParent}
+\SetKwProg{Fn}{Procedure }{:}{}
+\Fn{\FunctionID{service, parent}}{
+\If{service.Parent == parent}{return}
+\;parents $\longleftarrow$ parents $\cup$ \{parent\}
+\;service.parent $\longleftarrow$ parent
+\;\ForEach{child $\in$ service.children}{\FuncSty{Trigger} \FuncSty{Send(}\ArgSty{GRANDPARENT, child, service, parent, myself}\FuncSty{)}}
+}
+
+\;\SetKwFunction{FunctionID}{Receive}
+\SetKwProg{Fn}{Upon event }{ do:}{}
+\Fn{\FunctionID{GRANDPARENT, service, grandparent, sender}}{
+service.grandparent $\longleftarrow$ grandparent
+}
+
+\;\SetKwFunction{FunctionID}{updateChildren}
+\SetKwProg{Fn}{Procedure }{:}{}
+\Fn{\FunctionID{service}}{
+orderedChild $\longleftarrow$ \FuncSty{order(}\ArgSty{service.children}\FuncSty{)}
+\;\ForEach{child $\in$ service.children}{\FuncSty{Trigger} \FuncSty{Send(}\ArgSty{SIBLINGS, child, service, orderedChild}\FuncSty{)}}
+}
+
+\;\SetKwFunction{FunctionID}{addChild}
+\SetKwProg{Fn}{Procedure }{:}{}
+\Fn{\FunctionID{service, child}}{
+\If{child $\notin$ children}{children $\longleftarrow$ children $\cup$ \{child\}}
+\;\If{child $\notin$ service.children}{service.children $\longleftarrow$ service.children $\cup$ \{child\}
+\;servicesByChild[child] $\longleftarrow$ servicesByChild[child] $\cup$ \{service\}
+\;\FuncSty{Call updateChildren(}\ArgSty{service}\FuncSty{)}}
+}
+
+\BlankLine
+\BlankLine
+\BlankLine
+\end{algorithm}
+\end{document}
+```
+
+Which ultimately generates the following pdf:
+
+![](small_example_image.png)
 
 ## Licensing
 
