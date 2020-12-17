@@ -1,7 +1,9 @@
 name: PseudoTex
-version: "1.0"
+version: "1.0.2"
 author: Bruno Anjos <bruno.vale.anjos@gmail.com>
 about: pseudocode transpiler to latex representation
+settings:
+  - ArgRequiredElseHelp
 args:
   - input:
       help: file name to read content from
