@@ -169,6 +169,7 @@ pub enum Expr {
 	Comment {
 		strings: Vec<String>
 	},
+	Undefined {}
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -347,7 +348,8 @@ impl Translate for Expr {
 			Expr::CallingArgs { e1, e2 } => format!("{}, {}", e1.eval_translate(), e2
 				.eval_translate()),
 			Expr::EmptySet {} => format!(empty_set_code!()),
-			Expr::Comment {strings} => format!("// {}", strings.join(" "))
+			Expr::Comment {strings} => format!("// {}", strings.join(" ")),
+			Expr::Undefined {} => format!(undefined_code!())
 		}
 	}
 }

@@ -299,7 +299,8 @@ pub Expression: Expr = {
 	<s: Set> => s,
 	<sa: StructAccess> => sa,
 	<m: MethodCall> => m,
-	<id: Id> => Expr::String(id.to_string())
+	<id: Id> => Expr::String(id.to_string()),
+	UNDEFINED => Expr::Undefined{},
 };
 
 pub Operation: Expr = {
@@ -351,17 +352,6 @@ pub OperatorWithSpace: Special = {
 pub Id: String = {
 	<s: STRING> UNDERSCORE <id: Id> => format!("{}\\_{}", s, id),
 	<s: STRING> => s.to_string(),
-};
-
-// Special characters
-pub Special: Special = {
-	UNDEFINED => Special::Undefined,
-	OPEN_BRA => Special::OpenBra,
-	CLOSE_BRA => Special::CloseBra,
-	OPEN_CURLY_BRA => Special::OpenCurlyBra,
-	CLOSE_CURLY_BRA => Special::CloseCurlyBra,
-	DOT => Special::Dot,
-	COMMA => Special::Comma,
 };
 
 match {

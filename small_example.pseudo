@@ -6,6 +6,7 @@ state:
 
 upon init do:
     fallback = getFallback();
+    nil = undefined;
     myId = randomString();
 
 upon event Receive(QUALITY_NOT_ASSURED, service, location) do:
