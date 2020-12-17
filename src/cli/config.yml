@@ -1,5 +1,5 @@
 name: PseudoTex
-version: "1.0.2"
+version: "1.1.0"
 author: Bruno Anjos <bruno.vale.anjos@gmail.com>
 about: pseudocode transpiler to latex representation
 settings:
