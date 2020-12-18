@@ -172,6 +172,9 @@ pub enum Expr {
 	Undefined {},
 	Cardinality {
 		e: Box<Expr>,
+	},
+	Negate {
+		e: Box<Expr>,
 	}
 }
 
@@ -200,7 +203,8 @@ pub enum Special {
 	GreaterThan,
 	GreaterEqThan,
 	Division,
-	Times
+	Times,
+	Diff,
 }
 
 pub trait Translate {
@@ -359,7 +363,8 @@ impl Translate for Expr {
 			Expr::EmptySet {} => format!(empty_set_code!()),
 			Expr::Comment { strings } => format!("// {}", strings.join(" ")),
 			Expr::Undefined {} => format!(undefined_code!()),
-			Expr::Cardinality {e} => format!(cardinality_code!(), e.eval_translate())
+			Expr::Cardinality { e } => format!(cardinality_code!(), e.eval_translate()),
+			Expr::Negate { e } => format!(not_code!(), e.eval_translate()),
 		}
 	}
 }
@@ -390,7 +395,8 @@ impl Translate for Special {
 			Special::GreaterThan => greater_code!(),
 			Special::GreaterEqThan => greater_eq_code!(),
 			Special::Division => division_code!(),
-			Special::Times => times_code!()
+			Special::Times => times_code!(),
+			Special::Diff => different_code!()
 		}
 			.to_string()
 	}

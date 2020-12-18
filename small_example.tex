@@ -15,65 +15,39 @@
 \SetKwFunction{FunctionID}{State}
 \SetKwProg{Fn}{}{:}{}
 \Fn{\FunctionID}{
-parents
-// these are parents
-\;services
-\;myId
-\;fallback
+acceptors
+// set of known acceptors
+\;promises
+// promise messages received
+\;n
+// proposal number
+\;v
+// proposal value
 }
 
 \;\SetKwFunction{FunctionID}{Init}
 \SetKwProg{Fn}{Upon }{ do:}{}
 \Fn{\FunctionID}{
-fallback $\longleftarrow$ \FuncSty{getFallback(}\ArgSty{}\FuncSty{)}
-\;nil $\longleftarrow$ $\bot$
-\;myId $\longleftarrow$ \FuncSty{randomString(}\ArgSty{}\FuncSty{)}
+// gets set of acceptors
+\;acceptors $\longleftarrow$ \FuncSty{getAcceptors(}\ArgSty{}\FuncSty{)}
 }
 
 \;\SetKwFunction{FunctionID}{Receive}
 \SetKwProg{Fn}{Upon event }{ do:}{}
-\Fn{\FunctionID{QUALITY\_NOT\_ASSURED, service, location}}{
-newChild $\longleftarrow$ \FuncSty{getNodeClosestTo(}\ArgSty{location}\FuncSty{)}
-\;\FuncSty{Trigger} \FuncSty{Send(}\ArgSty{DEPLOY\_SERVICE, newChild, service, myself}\FuncSty{)}
-\;\FuncSty{Call addChild(}\ArgSty{service, newChild}\FuncSty{)}
+\Fn{\FunctionID{PROPOSE, v}}{
+promises $\longleftarrow$ \{\}
+\;// generates a unique number higher than any n seen so far
+\;n $\longleftarrow$ \FuncSty{getNextN(}\ArgSty{}\FuncSty{)}
+\;v $\longleftarrow$ $\bot$
+\;\ForEach{acceptor $\in$ acceptors}{\FuncSty{Trigger} \FuncSty{Send(}\ArgSty{PREPARE, acceptor, n}\FuncSty{)}}
 }
 
 \;\SetKwFunction{FunctionID}{Receive}
 \SetKwProg{Fn}{Upon event }{ do:}{}
-\Fn{\FunctionID{DEPLOY\_SERVICE, service, sender}}{
-\If{service $\notin$ services}{services $\longleftarrow$ services $\cup$ \{service\}}
-\;\FuncSty{Call updateParent(}\ArgSty{service, sender}\FuncSty{)}
-}
-
-\;\SetKwFunction{FunctionID}{updateParent}
-\SetKwProg{Fn}{Procedure }{:}{}
-\Fn{\FunctionID{service, parent}}{
-\If{service.Parent == parent}{return}
-\;parents $\longleftarrow$ parents $\cup$ \{parent\}
-\;service.parent $\longleftarrow$ parent
-\;\ForEach{child $\in$ service.children}{\FuncSty{Trigger} \FuncSty{Send(}\ArgSty{GRANDPARENT, child, service, parent, myself}\FuncSty{)}}
-}
-
-\;\SetKwFunction{FunctionID}{Receive}
-\SetKwProg{Fn}{Upon event }{ do:}{}
-\Fn{\FunctionID{GRANDPARENT, service, grandparent, sender}}{
-service.grandparent $\longleftarrow$ grandparent
-}
-
-\;\SetKwFunction{FunctionID}{updateChildren}
-\SetKwProg{Fn}{Procedure }{:}{}
-\Fn{\FunctionID{service}}{
-orderedChild $\longleftarrow$ \FuncSty{order(}\ArgSty{service.children}\FuncSty{)}
-\;\ForEach{child $\in$ service.children}{\FuncSty{Trigger} \FuncSty{Send(}\ArgSty{SIBLINGS, child, service, orderedChild}\FuncSty{)}}
-}
-
-\;\SetKwFunction{FunctionID}{addChild}
-\SetKwProg{Fn}{Procedure }{:}{}
-\Fn{\FunctionID{service, child}}{
-\If{child $\notin$ children}{children $\longleftarrow$ children $\cup$ \{child\}}
-\;\If{child $\notin$ service.children}{service.children $\longleftarrow$ service.children $\cup$ \{child\}
-\;servicesByChild[child] $\longleftarrow$ servicesByChild[child] $\cup$ \{service\}
-\;\FuncSty{Call updateChildren(}\ArgSty{service}\FuncSty{)}}
+\Fn{\FunctionID{PROMISE, prepared\_n, na, va}}{
+\If{prepared\_n $=$ n}{promises $\longleftarrow$ promises $\cup$ \{na, va\}
+\;\If{$\neg$ (\#promises $\neq$ \#acceptors / 2)}{v $\longleftarrow$ \FuncSty{getVaWithHighestNa(}\ArgSty{promises}\FuncSty{)}
+\;\ForEach{acceptor $\in$ acceptors}{\FuncSty{Trigger} \FuncSty{Send(}\ArgSty{ACCEPT, acceptor, n}\FuncSty{)}}}}
 }
 
 \BlankLine

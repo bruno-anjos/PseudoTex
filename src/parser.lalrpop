@@ -302,6 +302,7 @@ pub Expression: Expr = {
 	<id: Id> => Expr::String(id.to_string()),
 	UNDEFINED => Expr::Undefined{},
 	CARDINALITY <e:Expression> => Expr::Cardinality{e: Box::new(e)},
+	NOT OPEN_PAR <e: Expression> CLOSE_PAR => Expr::Negate{e: Box::new(e)},
 };
 
 pub Operation: Expr = {
@@ -352,6 +353,7 @@ pub OperatorWithSpace: Special = {
 	LESS_EQ_THAN => Special::LessEqThan,
 	GREATER_THAN => Special::GreaterThan,
 	GREATER_EQ_THAN => Special::GreaterEqThan,
+	DIFF_THAN => Special::Diff,
 	TIMES => Special::Times,
 	DIVISION => Special::Division
 }
@@ -362,6 +364,8 @@ pub Id: String = {
 };
 
 match {
+	"!"				=> NOT,
+	"!="			=> DIFF_THAN,
 	"<"				=> LESS_THAN,
 	"<="			=> LESS_EQ_THAN,
 	">"				=> GREATER_THAN,

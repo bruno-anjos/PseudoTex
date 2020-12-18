@@ -327,6 +327,14 @@ macro_rules! greater_eq_code {
 	() => ("$\\geq$");
 }
 
+macro_rules! different_code {
+	() => ("$\\neq$");
+}
+
+macro_rules! not_code {
+	() => ("$\\neg$ ({})");
+}
+
 macro_rules! division_code {
 	() => ("/");
 }
