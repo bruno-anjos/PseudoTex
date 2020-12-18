@@ -264,7 +264,7 @@ macro_rules! dot_code {
 }
 
 macro_rules! comp_eq_code {
-	() => ("==");
+	() => ("$=$");
 }
 
 macro_rules! return_code {
@@ -309,4 +309,32 @@ macro_rules! set_code {
 
 macro_rules! empty_set_code {
 	() => ("\\{{\\}}");
+}
+
+macro_rules! less_code {
+	() => ("$<$");
+}
+
+macro_rules! less_eq_code {
+	() => ("$\\leq$");
+}
+
+macro_rules! greater_code {
+	() => ("$>$");
+}
+
+macro_rules! greater_eq_code {
+	() => ("$\\geq$");
+}
+
+macro_rules! division_code {
+	() => ("/");
+}
+
+macro_rules! times_code {
+	() => ("*");
+}
+
+macro_rules! cardinality_code {
+	() => ("\\#{}");
 }

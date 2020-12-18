@@ -171,7 +171,7 @@ pub Comment: Expr = {
 
 pub MultiString: Vec<String> = {
 	<s: STRING> => vec![s.to_string()],
-    <s: STRING> <mut ss: MultiString> => { let mut res = vec![s.to_string()]; res.append(&mut ss); res }
+	<s: STRING> <mut ss: MultiString> => { let mut res = vec![s.to_string()]; res.append(&mut ss); res }
 };
 
 pub MultiMethodCall: Expr = {
@@ -301,30 +301,31 @@ pub Expression: Expr = {
 	<m: MethodCall> => m,
 	<id: Id> => Expr::String(id.to_string()),
 	UNDEFINED => Expr::Undefined{},
+	CARDINALITY <e:Expression> => Expr::Cardinality{e: Box::new(e)},
 };
 
 pub Operation: Expr = {
 	<e1: VecAccess> <op: OperatorWithSpace> <e2: Expression> => Expr::Operation{e1: Box::new(e1), op, e2: Box::new
 	(e2)},
 	<e1: Set> <op: OperatorWithSpace> <e2: Expression> => Expr::Operation{e1: Box::new(e1), op, e2: Box::new
-    	(e2)},
-    <e1: StructAccess> <op: OperatorWithSpace> <e2: Expression> => Expr::Operation{e1: Box::new(e1), op, e2: Box::new
-    	(e2)},
-    <e1: MethodCall> <op: OperatorWithSpace> <e2: Expression> => Expr::Operation{e1: Box::new(e1), op, e2: Box::new
-    	(e2)},
-    <e1: Id> <op: OperatorWithSpace> <e2: Expression> => Expr::Operation{e1: Box::new(Expr::String(e1.to_string())), op, e2:
-    	Box::new(e2)},
+		(e2)},
+	<e1: StructAccess> <op: OperatorWithSpace> <e2: Expression> => Expr::Operation{e1: Box::new(e1), op, e2: Box::new
+		(e2)},
+	<e1: MethodCall> <op: OperatorWithSpace> <e2: Expression> => Expr::Operation{e1: Box::new(e1), op, e2: Box::new
+		(e2)},
+	<e1: Id> <op: OperatorWithSpace> <e2: Expression> => Expr::Operation{e1: Box::new(Expr::String(e1.to_string())), op, e2:
+		Box::new(e2)},
 };
 
 pub VecAccess: Expr = {
 	<e1: StructAccess> OPEN_BRA <e2: Expression> CLOSE_BRA => Expr::Access{l: Box::new(e1), r: Box::new(e2)},
-    <e1: Id> OPEN_BRA <e2: Expression> CLOSE_BRA => Expr::Access{l: Box::new(Expr::String(e1.to_string())),
-     r: Box::new(e2)},
-    <e1: MethodCall> OPEN_BRA <e2: Expression> CLOSE_BRA => Expr::Access{l: Box::new(e1), r: Box::new(e2)},
+	<e1: Id> OPEN_BRA <e2: Expression> CLOSE_BRA => Expr::Access{l: Box::new(Expr::String(e1.to_string())),
+	 r: Box::new(e2)},
+	<e1: MethodCall> OPEN_BRA <e2: Expression> CLOSE_BRA => Expr::Access{l: Box::new(e1), r: Box::new(e2)},
 };
 
 pub Set: Expr = {
-	OPEN_CURLY_BRA <e: Expression> CLOSE_CURLY_BRA => Expr::Set{e: Box::new(e)},
+	OPEN_CURLY_BRA <e: CallingArgs> CLOSE_CURLY_BRA => Expr::Set{e: Box::new(e)},
 	OPEN_CURLY_BRA CLOSE_CURLY_BRA => Expr::EmptySet{},
 };
 
@@ -347,6 +348,12 @@ pub OperatorWithSpace: Special = {
 	INTERSECT => Special::Intersect,
 	AND => Special::And,
 	COMP_EQ => Special::CompEq,
+	LESS_THAN => Special::LessThan,
+	LESS_EQ_THAN => Special::LessEqThan,
+	GREATER_THAN => Special::GreaterThan,
+	GREATER_EQ_THAN => Special::GreaterEqThan,
+	TIMES => Special::Times,
+	DIVISION => Special::Division
 }
 
 pub Id: String = {
@@ -355,6 +362,11 @@ pub Id: String = {
 };
 
 match {
+	"<"				=> LESS_THAN,
+	"<="			=> LESS_EQ_THAN,
+	">"				=> GREATER_THAN,
+	">="			=> GREATER_EQ_THAN,
+	"#"				=> CARDINALITY,
 	"="				=> EQ,
 	"=="			=> COMP_EQ,
 	"and"			=> AND,
@@ -371,6 +383,8 @@ match {
 	"}"     		=> CLOSE_CURLY_BRA,
 	"+" 			=> PLUS,
 	"-" 			=> MINUS,
+	"*" 			=> TIMES,
+	"/" 			=> DIVISION,
 	"//"			=> DOUBLE_FORWARD_SLASH,
 	"state" 		=> STATE,
 	"interface"		=> INTERFACE,
@@ -406,5 +420,5 @@ match {
 	"return" 		=> RETURN,
 	"break" 		=> BREAK,
 	"_"				=> UNDERSCORE,
-	r"[a-zA-Z0-9]+"  		=> STRING
+	r"[a-zA-Z0-9]+" => STRING
 }

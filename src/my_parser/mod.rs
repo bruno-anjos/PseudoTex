@@ -169,7 +169,10 @@ pub enum Expr {
 	Comment {
 		strings: Vec<String>
 	},
-	Undefined {}
+	Undefined {},
+	Cardinality {
+		e: Box<Expr>,
+	}
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -192,6 +195,12 @@ pub enum Special {
 	And,
 	Plus,
 	Minus,
+	LessThan,
+	LessEqThan,
+	GreaterThan,
+	GreaterEqThan,
+	Division,
+	Times
 }
 
 pub trait Translate {
@@ -348,8 +357,9 @@ impl Translate for Expr {
 			Expr::CallingArgs { e1, e2 } => format!("{}, {}", e1.eval_translate(), e2
 				.eval_translate()),
 			Expr::EmptySet {} => format!(empty_set_code!()),
-			Expr::Comment {strings} => format!("// {}", strings.join(" ")),
-			Expr::Undefined {} => format!(undefined_code!())
+			Expr::Comment { strings } => format!("// {}", strings.join(" ")),
+			Expr::Undefined {} => format!(undefined_code!()),
+			Expr::Cardinality {e} => format!(cardinality_code!(), e.eval_translate())
 		}
 	}
 }
@@ -375,6 +385,12 @@ impl Translate for Special {
 			Special::Comma => comma_code!(),
 			Special::Plus => plus_code!(),
 			Special::Minus => minus_code!(),
+			Special::LessThan => less_code!(),
+			Special::LessEqThan => less_eq_code!(),
+			Special::GreaterThan => greater_code!(),
+			Special::GreaterEqThan => greater_eq_code!(),
+			Special::Division => division_code!(),
+			Special::Times => times_code!()
 		}
 			.to_string()
 	}
