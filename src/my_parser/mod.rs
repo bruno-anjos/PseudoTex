@@ -175,7 +175,11 @@ pub enum Expr {
 	},
 	Negate {
 		e: Box<Expr>,
-	}
+	},
+	LineWithComment {
+		e: Box<Expr>,
+		c: Box<Expr>
+	},
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -365,6 +369,8 @@ impl Translate for Expr {
 			Expr::Undefined {} => format!(undefined_code!()),
 			Expr::Cardinality { e } => format!(cardinality_code!(), e.eval_translate()),
 			Expr::Negate { e } => format!(not_code!(), e.eval_translate()),
+			Expr::LineWithComment{e, c} => format!("{} {}", e.eval_translate(), c
+				.eval_translate())
 		}
 	}
 }

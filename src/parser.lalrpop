@@ -156,13 +156,22 @@ pub Body: Expr = {
 
 pub BodyLine: Expr = {
 	<e: Comment> SEMI_COLON => e,
-	<e: Assign> SEMI_COLON => e,
-	<e: Trigger> SEMI_COLON => e,
-	<e: MethodCall> SEMI_COLON => e,
-	<e: ProcedureCall> SEMI_COLON => e,
-	<e: SetupTimer> SEMI_COLON => e,
-	<e: CancelTimer> SEMI_COLON => e,
-	<e: Control> SEMI_COLON => e,
+	<e: BodyLineSimple> SEMI_COLON => e,
+	<e: BodyLineWithComment> SEMI_COLON => e,
+};
+
+pub BodyLineSimple: Expr = {
+	<e: Assign> => e,
+	<e: Trigger> => e,
+	<e: MethodCall> => e,
+	<e: ProcedureCall> => e,
+	<e: SetupTimer> => e,
+	<e: CancelTimer> => e,
+	<e: Control> => e,
+};
+
+pub BodyLineWithComment: Expr = {
+	<e: BodyLineSimple> <c: Comment> => Expr::LineWithComment{e: Box::new(e), c: Box::new(c)}
 };
 
 pub Comment: Expr = {
