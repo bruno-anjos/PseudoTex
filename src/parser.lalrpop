@@ -312,7 +312,6 @@ pub Expression: Expr = {
 	UNDEFINED => Expr::Undefined{},
 	CARDINALITY <e:Expression> => Expr::Cardinality{e: Box::new(e)},
 	NOT OPEN_PAR <e: Expression> CLOSE_PAR => Expr::Negate{e: Box::new(e)},
-	MINUS OPEN_PAR <e:Expression> CLOSE_PAR => Expr::Negative{e: Box::new(e)},
 };
 
 pub Operation: Expr = {
