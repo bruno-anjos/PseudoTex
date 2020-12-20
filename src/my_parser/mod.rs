@@ -167,7 +167,7 @@ pub enum Expr {
 	},
 	Empty,
 	Comment {
-		strings: Vec<String>
+		string: String
 	},
 	Undefined {},
 	Cardinality {
@@ -180,6 +180,9 @@ pub enum Expr {
 		e: Box<Expr>,
 		c: Box<Expr>
 	},
+	Negative {
+		e: Box<Expr>
+	}
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -365,12 +368,13 @@ impl Translate for Expr {
 			Expr::CallingArgs { e1, e2 } => format!("{}, {}", e1.eval_translate(), e2
 				.eval_translate()),
 			Expr::EmptySet {} => format!(empty_set_code!()),
-			Expr::Comment { strings } => format!("// {}", strings.join(" ")),
+			Expr::Comment { string } => format!("// {}", string),
 			Expr::Undefined {} => format!(undefined_code!()),
 			Expr::Cardinality { e } => format!(cardinality_code!(), e.eval_translate()),
 			Expr::Negate { e } => format!(not_code!(), e.eval_translate()),
 			Expr::LineWithComment{e, c} => format!("{} {}", e.eval_translate(), c
-				.eval_translate())
+				.eval_translate()),
+			Expr::Negative {e} => format!("-{}", e.eval_translate())
 		}
 	}
 }

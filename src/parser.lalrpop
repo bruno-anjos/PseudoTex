@@ -175,7 +175,7 @@ pub BodyLineWithComment: Expr = {
 };
 
 pub Comment: Expr = {
-	DOUBLE_FORWARD_SLASH <e: MultiString> => Expr::Comment{strings: e},
+	DOUBLE_FORWARD_SLASH <e: CommentContent> => Expr::Comment{string: e},
 };
 
 pub MultiString: Vec<String> = {
@@ -312,6 +312,7 @@ pub Expression: Expr = {
 	UNDEFINED => Expr::Undefined{},
 	CARDINALITY <e:Expression> => Expr::Cardinality{e: Box::new(e)},
 	NOT OPEN_PAR <e: Expression> CLOSE_PAR => Expr::Negate{e: Box::new(e)},
+	MINUS OPEN_PAR <e:Expression> CLOSE_PAR => Expr::Negative{e: Box::new(e)},
 };
 
 pub Operation: Expr = {
@@ -339,10 +340,16 @@ pub Set: Expr = {
 	OPEN_CURLY_BRA CLOSE_CURLY_BRA => Expr::EmptySet{},
 };
 
+pub StructAccessible: Expr = {
+	<s: Set> => s,
+	<s: Id> => Expr::String(s),
+	<v: VecAccess> => v,
+};
+
 pub StructAccess: Expr = {
-	<s1: STRING> DOT <s2: STRING> => Expr::SingleLineMultipleTermNoSpace{
-		t1: Box::new(Expr::String(format!("{}.", s1))),
-		t2: Box::new(Expr::String(s2.to_string()))
+	<s1: StructAccessible> DOT <s2: Id> => Expr::SingleLineMultipleTermNoSpace{
+		t1: Box::new(s1),
+		t2: Box::new(Expr::String(s2))
 	},
 };
 
@@ -369,7 +376,74 @@ pub OperatorWithSpace: Special = {
 
 pub Id: String = {
 	<s: STRING> UNDERSCORE <id: Id> => format!("{}\\_{}", s, id),
-	<s: STRING> => s.to_string(),
+	<s: STRING> => s.to_string()
+};
+
+pub CommentContent: String = {
+	<t: CommentToken> => t.to_string(),
+	<t: CommentToken> <c: CommentContent> => format!("{} {}", t, c)
+}
+
+pub CommentToken: String = {
+	<s: NOT> => s.to_string(),
+    <s: DIFF_THAN> => s.to_string(),
+    <s: LESS_THAN> => s.to_string(),
+    <s: LESS_EQ_THAN> => s.to_string(),
+    <s: GREATER_THAN> => s.to_string(),
+    <s: GREATER_EQ_THAN> => s.to_string(),
+    <s: CARDINALITY> => s.to_string(),
+    <s: EQ> => s.to_string(),
+    <s: COMP_EQ> => s.to_string(),
+    <s: AND> => s.to_string(),
+    <s: UPON> => s.to_string(),
+    <s: EVENT> => s.to_string(),
+    <s: DO> => s.to_string(),
+    <s: COLON> => s.to_string(),
+    <s: COMMA> => s.to_string(),
+    <s: OPEN_PAR> => s.to_string(),
+    <s: CLOSE_PAR> => s.to_string(),
+    <s: OPEN_BRA> => s.to_string(),
+    <s: CLOSE_BRA> => s.to_string(),
+    <s: OPEN_CURLY_BRA> => s.to_string(),
+    <s: CLOSE_CURLY_BRA> => s.to_string(),
+    <s: PLUS> => s.to_string(),
+    <s: MINUS> => s.to_string(),
+    <s: TIMES> => s.to_string(),
+    <s: DIVISION> => s.to_string(),
+    <s: STATE> => s.to_string(),
+    <s: INTERFACE> => s.to_string(),
+    <s: REQUESTS> => s.to_string(),
+    <s: INDICATIONS> => s.to_string(),
+    <s: TRIGGER> => s.to_string(),
+    <s: BEGIN> => s.to_string(),
+    <s: END> => s.to_string(),
+    <s: IF> => s.to_string(),
+    <s: ELSE> => s.to_string(),
+    <s: ELIF> => s.to_string(),
+    <s: THEN> => s.to_string(),
+    <s: IN> => s.to_string(),
+    <s: EXISTS> => s.to_string(),
+    <s: INIT> => s.to_string(),
+    <s: TIMER> => s.to_string(),
+    <s: CRASH> => s.to_string(),
+    <s: PROCEDURE> => s.to_string(),
+    <s: CALL> => s.to_string(),
+    <s: SETUP> => s.to_string(),
+    <s: PERIODIC> => s.to_string(),
+    <s: CANCEL> => s.to_string(),
+    <s: FOREACH> => s.to_string(),
+    <s: SET_MINUS> => s.to_string(),
+    <s: NOT_IN> => s.to_string(),
+    <s: NOT_EXISTS> => s.to_string(),
+    <s: UNION> => s.to_string(),
+    <s: INTERSECT> => s.to_string(),
+    <s: UNDEFINED> => s.to_string(),
+    <s: DOT> => s.to_string(),
+    <s: CONTINUE> => s.to_string(),
+    <s: RETURN> => s.to_string(),
+    <s: BREAK> => s.to_string(),
+    <s: UNDERSCORE> => s.to_string(),
+    <s: STRING> => s.to_string(),
 };
 
 match {
@@ -433,5 +507,5 @@ match {
 	"return" 		=> RETURN,
 	"break" 		=> BREAK,
 	"_"				=> UNDERSCORE,
-	r"[a-zA-Z0-9]+" => STRING
+	r"[a-zA-Z0-9]+" => STRING,
 }
