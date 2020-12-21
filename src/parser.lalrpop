@@ -346,7 +346,7 @@ pub StructAccessible: Expr = {
 };
 
 pub StructAccess: Expr = {
-	<s1: StructAccessible> DOT <s2: Id> => Expr::SingleLineMultipleTermNoSpace{
+	<s1: StructAccessible> DOT <s2: Id> => Expr::StructAccess{
 		t1: Box::new(s1),
 		t2: Box::new(Expr::String(s2))
 	},

@@ -182,6 +182,10 @@ pub enum Expr {
 	},
 	Negative {
 		e: Box<Expr>
+	},
+	StructAccess {
+		t1: Box<Expr>,
+		t2: Box<Expr>
 	}
 }
 
@@ -375,6 +379,8 @@ impl Translate for Expr {
 			Expr::LineWithComment{e, c} => format!("{} {}", e.eval_translate(), c
 				.eval_translate()),
 			Expr::Negative {e} => format!("-{}", e.eval_translate())
+			Expr::StructAccess {t1, t2} => format!("{}.{}", t1.eval_translate(), t2
+			.eval_translate())
 		}
 	}
 }

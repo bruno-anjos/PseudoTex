@@ -280,7 +280,7 @@ macro_rules! break_code {
 }
 
 macro_rules! and_code {
-	() => ("&&");
+	() => ("$\\land$");
 }
 
 macro_rules! comma_code {
