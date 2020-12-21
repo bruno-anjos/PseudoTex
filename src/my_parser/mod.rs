@@ -378,7 +378,7 @@ impl Translate for Expr {
 			Expr::Negate { e } => format!(not_code!(), e.eval_translate()),
 			Expr::LineWithComment{e, c} => format!("{} {}", e.eval_translate(), c
 				.eval_translate()),
-			Expr::Negative {e} => format!("-{}", e.eval_translate())
+			Expr::Negative {e} => format!("-{}", e.eval_translate()),
 			Expr::StructAccess {t1, t2} => format!("{}.{}", t1.eval_translate(), t2
 			.eval_translate())
 		}
